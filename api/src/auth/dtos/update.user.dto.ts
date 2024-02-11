@@ -1,6 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserType } from '../types/user.type';
+import { UserType } from '../../types/user.type';
 
 export class UpdateUserDto {
   @ApiProperty({

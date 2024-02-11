@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { Employee } from './employee.entity';
 
-@Entity({ name: 'sheet_time', schema: 'generic' })
+@Entity({ name: 'sheet_times', schema: 'generic' })
 
 export class TimeSheet {
 

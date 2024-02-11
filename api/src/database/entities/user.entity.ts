@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
 import { Profile } from './profile.entity';
 
 @Entity({ name: 'users', schema: 'generic' })
@@ -26,7 +26,7 @@ export class User {
     @Column()
     user_created_at: Date;
 
-    @OneToOne(() => Profile)
+    @ManyToOne(() => Profile)
     @JoinColumn({ name: 'profile_id' })
     profile: Profile;
 

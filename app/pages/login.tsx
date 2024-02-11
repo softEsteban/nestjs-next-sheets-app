@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
-// import Navbar from '@/components/Navbar/Navbar';
 import { FaUserCircle, FaLock } from 'react-icons/fa';
-// import { FcGoogle } from 'react-icons/fc';
 import '../app/globals.css';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-// import { setSelectedComponent } from '@/redux/reducer';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import PublicLayout from '@/components/layouts/PublicLayout';
-import Image from 'next/image';
-// import PublicLayout from '@/components/layouts/PublicLayout';
+import { setSelectedComponent } from '@/redux/reducer';
 
 const Login = () => {
     const router = useRouter();
 
     //Store
     const dispatch = useDispatch();
-    //   const setSelectedComponentMenu = (token: any) => {
-    //     dispatch(setSelectedComponent(token));
-    //   };
+    const setSelectedComponentMenu = (menu: any) => {
+        dispatch(setSelectedComponent(menu));
+    };
+
     const [user, setUser] = useState({ email: '', password: '' });
 
     const handleLogin = async () => {
@@ -40,7 +37,7 @@ const Login = () => {
                 const token = data.token;
 
                 if (token) {
-                    handleSuccessfulAction("Login exitoso!");
+                    handleSuccessfulAction("Successful login!");
 
                     // Localstorage
                     const userData = {
@@ -51,11 +48,18 @@ const Login = () => {
                     const userSessionDataString = JSON.stringify(userData);
                     localStorage.setItem('userSession', userSessionDataString);
 
-                    //   setSelectedComponentMenu("/home");
+                    setSelectedComponentMenu("/home");
                     setTimeout(() => {
                         router.push('/home');
                     }, 1000);
                 }
+            }
+
+            else if (response.data.message === "User was not found") {
+                handleFailedAction("User was not found!");
+            }
+            else if (response.data.message === "Password is incorrect") {
+                handleFailedAction("Password is incorrect!");
             }
 
         } catch (error: any) {
@@ -103,7 +107,7 @@ const Login = () => {
                                 placeholder="Email"
                                 className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
                                 value={user.email}
-                            onChange={(e) => setUser({ ...user, email: e.target.value })}
+                                onChange={(e) => setUser({ ...user, email: e.target.value })}
                             />
                         </div>
                     </div>
@@ -116,7 +120,7 @@ const Login = () => {
                                 className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
                                 value={user.password}
 
-                            onChange={(e) => setUser({ ...user, password: e.target.value })}
+                                onChange={(e) => setUser({ ...user, password: e.target.value })}
                             />
                         </div>
                     </div>

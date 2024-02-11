@@ -17,28 +17,28 @@ export class UsersController {
   }
 
   @Get()
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Retrieve all registered users' })
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Retrieve a single user by ID' })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);
   }
 
   @Patch(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update a user by ID' })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  // @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete a user by ID' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

@@ -9,19 +9,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(private configService: ConfigService) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            // secretOrKey: configService.get<string>('JWT_SECRET_KEY')
-            secretOrKey: "jamaavbavbvb"
+            secretOrKey: configService.get<string>('JWT_SECRET_KEY')
         });
     }
 
     async validate(payload: JWTPayload) {
-        // Update the property names to match the actual payload structure
         const { email } = payload;
-
         if (!email) {
             throw new UnauthorizedException();
         }
-
         return { email };
     }
 }

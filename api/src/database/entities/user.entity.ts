@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Profile } from './profile.entity';
+import { Employee } from './employee.entity';
+import { UserType } from 'src/types/user.type';
 
 @Entity({ name: 'users', schema: 'generic' })
 
@@ -14,7 +16,7 @@ export class User {
     @Column()
     user_lastname: string;
 
-    @Column()
+    @Column({ type: 'enum', enum: UserType, default: UserType.CLIENT })
     user_type: string;
 
     @Column()
@@ -35,4 +37,7 @@ export class User {
 
     @Column()
     user_avatar: string;
+
+    @OneToMany(() => Employee, employee => employee.user)
+    employees: Employee[];
 }

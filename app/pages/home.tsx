@@ -1,68 +1,64 @@
 import React from "react";
-import '../app/globals.css'
+import { useRouter } from "next/router";
 import AppLayout from "@/components/layouts/AppLayout";
-// import CustomerHome from "@/components/CustomerHome/CustomerHome";
-// import AdminHome from "@/components/AdminHome/AdminHome";
-// import VendorHome from "@/components/VendorHome/VendorHome";
+import { FaUsers, FaMoneyBillAlt } from "react-icons/fa";
+import { user } from "@/utils/authUtils";
+import DashboardBanner from "@/components/DashboardBanner/DashboardBanner";
 
 export default function Home() {
+    const router = useRouter();
 
-    let storedData;
-    let user: any;
+    const redirectToPayrolls = () => {
+        router.push("/payrolls");
+    };
 
-    try {
-        storedData = localStorage.getItem('userSession');
-    } catch (error) {
-        console.error('Error accessing localStorage:', error);
-    }
-    let userData = undefined;
-    if (typeof storedData !== 'undefined' && storedData !== null) {
-        try {
-            userData = JSON.parse(storedData);
-            user = userData?.user || null;
-        } catch (error) {
-            console.error('Error parsing JSON from localStorage:', error);
-        }
-    }
+    const redirectToEmployees = () => {
+        router.push("/employees");
+    };
 
     return (
-        <>
-            <AppLayout>
-                <title>Home</title>
-                <main className="min-h-screen p-4 sm:p-8 bg-gray-100 rounded-xl">
-                    <section className="mt-8">
-                        <section className="flex items-center justify-between mt-8 mb-8">
-                            <h2 className="text-2xl font-semibold mb-4">Welcome</h2>
-                        </section>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {/* {ordersData.map((order) => (
-                                <div key={order._id} className="bg-white p-6 rounded-md shadow-md">
-                                    <h3 className="text-xl font-semibold mb-4">Orden #{order._id}</h3>
-                                    <p>
-                                        <strong>Total:</strong> ${order.total}
-                                    </p>
-                                    <p>
-                                        <strong>Estado de pago:</strong> {order.paymentStatus}
-                                    </p>
-                                    <p>
-                                        <strong>Estado de la orden:</strong> {order.orderStatus}
-                                    </p>
-                                    <ul className="mt-4">
-                                        {order.products.map((product: any) => (
-                                            <li key={product._id}>
-                                                {product.name} - Cantidad: {product.quantity} - Precio: ${product.price}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))} */}
+        <AppLayout>
+            <title>Home</title>
+            <main className="min-h-screen p-4 sm:p-8 bg-gray-100 rounded-xl">
+                <section className="mt-8">
+                    <section className="flex items-center justify-between mt-8 mb-8">
+                        <div>
+                            <h2 className="text-2xl font-semibold mb-2">Welcome back, {user?.user_name}!</h2>
+                            <p className="text-sm text-gray-500">Explore different modules in the dashboard</p>
+                        </div>
+                        <div className="flex items-center">
+                            {/* Add button if needed */}
                         </div>
                     </section>
-                </main>
-                
-            </AppLayout>
 
-        </>
+                    <DashboardBanner/>
+
+                    <section className="flex items-center justify-between mt-8 mb-8">
+                        <h2 className="text-2xl font-semibold mb-2">Explore Modules</h2>
+                        {/* Subtitle can go here */}
+                    </section>
+
+                    <section className="flex flex-wrap mt-8">
+                        <div
+                            onClick={redirectToPayrolls}
+                            className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                        >
+                            <FaMoneyBillAlt className="text-white text-4xl mb-2" />
+                            <p className="text-white text-xl font-semibold">View Payrolls</p>
+                        </div>
+                        <div
+                            onClick={redirectToEmployees}
+                            className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                        >
+                            <FaUsers className="text-white text-4xl mb-2" />
+                            <p className="text-white text-xl font-semibold">View Employees</p>
+                        </div>
+                    </section>
+
+                    {/* Additional modules can be added here */}
+
+                </section>
+            </main>
+        </AppLayout>
     );
 }

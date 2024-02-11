@@ -1,30 +1,11 @@
 import React from 'react';
-import { FaBars, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaClock, FaHardHat, FaHome, FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import { menu, user } from "@/utils/authUtils";
 
 const Sidebar = ({ isSidebarOpen }: any) => {
 
     const router = useRouter();
-
-    let storedData;
-    let menu;
-    let user: any;
-
-    try {
-        storedData = localStorage.getItem('userSession');
-    } catch (error) {
-        console.error('Error accessing localStorage:', error);
-    }
-    let userData = undefined;
-    if (typeof storedData !== 'undefined' && storedData !== null) {
-        try {
-            userData = JSON.parse(storedData);
-            user = userData?.user || null;
-            menu = userData?.menu || null;
-        } catch (error) {
-            console.error('Error parsing JSON from localStorage:', error);
-        }
-    }
 
     const handleLogout = () => {
         localStorage.removeItem("userSession");
@@ -40,16 +21,43 @@ const Sidebar = ({ isSidebarOpen }: any) => {
                 {/* Main menus */}
 
                 <div
-                    className="flex items-center text-gray-800"
+                    className="flex items-center text-gray-800 mb-2"
                     style={{ paddingLeft: !item.menu_icon ? '20px' : '0' }}
                     onClick={() => handleMenuItemClick(item.menu_link)}
                     role="button"
                 >
-                    {item.menu_icon && (
+
+                    {item.menu_icon === 'FaHome' && (
                         <span className="mr-2">
-                            <FaBars></FaBars>
+                            <FaHome />
                         </span>
                     )}
+                    {item.menu_icon === 'FaBars' && (
+                        <span className="mr-2">
+                            <FaBars />
+                        </span>
+                    )}
+                    {item.menu_icon === 'FaRegUser' && (
+                        <span className="mr-2">
+                            <FaRegUser />
+                        </span>
+                    )}
+                    {item.menu_icon === 'FaClock' && (
+                        <span className="mr-2">
+                            <FaClock />
+                        </span>
+                    )}
+                    {item.menu_icon === 'FaHardHat' && (
+                        <span className="mr-2">
+                            <FaHardHat />
+                        </span>
+                    )}
+                    {item.menu_icon === 'FaSignOutAlt' && (
+                        <span className="mr-2">
+                            <FaSignOutAlt />
+                        </span>
+                    )}
+
                     {item.menu_name}
                 </div>
 
@@ -64,19 +72,17 @@ const Sidebar = ({ isSidebarOpen }: any) => {
     const handleMenuItemClick = (menuUrl: any) => {
         router.push({
             pathname: menuUrl,
-            
+
         });
     };
 
+
+    // User data
     const tagUserType = (userType: string) => {
-        if (userType === "USER") {
-            return "Usuario";
-        } else if (userType === "ADMIN") {
+        if (userType === "client") {
+            return "Client";
+        } else if (userType === "admin") {
             return "Admin";
-        } else if (userType === "CUSTOMER") {
-            return "Cliente";
-        } else if (userType === "VENDOR") {
-            return "Vendedor";
         }
         return "";
     };
@@ -115,14 +121,14 @@ const Sidebar = ({ isSidebarOpen }: any) => {
             {/* Sidebar header */}
             <div className="pb-2 pt-4 px-4 flex items-start">
                 <div className="flex-shrink-0 mr-4">
-                    <div style={{backgroundColor: "#8c7cf2"}} className="w-12 h-12 rounded-full text-white flex items-center justify-center text-xl">
+                    <div style={{ backgroundColor: "#8c7cf2" }} className="w-12 h-12 rounded-full text-white flex items-center justify-center text-xl">
                         {getFirstLetter()}
                     </div>
                 </div>
                 <div className="flex flex-col justify-between">
                     <div>
                         <p className="font-bold">{`${user?.user_name}`}</p>
-                        <p className="text-gray-500">{user?.user_type}</p>
+                        <p className="text-gray-500">{`${user?.user_lastname}`}</p>
                     </div>
                     <div className="mt-2 flex flex-col items-center md:flex-row md:items-center">
                         <span className="bg-gray-200 rounded-md py-1 px-2 text-sm text-gray-600 mb-2 md:mb-0 md:mr-2">

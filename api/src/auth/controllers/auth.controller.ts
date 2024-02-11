@@ -12,7 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
 
-    @ApiOperation({ summary: 'Login to API and get token' })
+    @ApiOperation({ summary: 'Login to API and get JWT token' })
     @ApiResponse({ status: 200, description: 'Login' })
     @Post('login')
     async login(@Body() loginDto: LoginDto): Promise<any> {

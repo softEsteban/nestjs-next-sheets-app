@@ -8,7 +8,6 @@ import { useDispatch } from 'react-redux';
 // import { setSelectedComponent } from '@/redux/reducer';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import Footer from '@/components/Footer/Footer';
 import axios from 'axios';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import Image from 'next/image';
@@ -22,13 +21,13 @@ const Login = () => {
     //   const setSelectedComponentMenu = (token: any) => {
     //     dispatch(setSelectedComponent(token));
     //   };
-    const [user, setUserForm] = useState({ email: '', password: '' });
+    const [user, setUser] = useState({ email: '', password: '' });
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post('/api/auth/login', {
-                email: user.email,
-                password: user.password,
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/auth/login`, {
+                user_email: user.email,
+                user_password: user.password,
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,7 +35,7 @@ const Login = () => {
             });
 
             // Successful request
-            if (response.status === 200) {
+            if (response.data.user) {
                 const data = response.data;
                 const token = data.token;
 
@@ -46,7 +45,7 @@ const Login = () => {
                     // Localstorage
                     const userData = {
                         user: data.user,
-                        menu: data.menu,
+                        menu: data.user.profile.profile_config,
                         token: data.token,
                     };
                     const userSessionDataString = JSON.stringify(userData);
@@ -73,9 +72,6 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = () => {
-        handleInfoAction("En desarrollo")
-    };
 
     const handleSuccessfulAction = (message: string) => {
         toast.success(message);
@@ -92,6 +88,7 @@ const Login = () => {
     return (
         <PublicLayout>
             <title>Login | OCMI</title>
+            <ToastContainer />
             <div className="min-h-screen flex items-center justify-center bg-cover relative" style={{ backgroundImage: `url("/civil-work.jpg")` }}>
                 <div className="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
                 <div className="bg-white bg-opacity-90 shadow-lg rounded-md p-8 max-w-md w-full relative z-10">
@@ -106,7 +103,7 @@ const Login = () => {
                                 placeholder="Email"
                                 className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
                                 value={user.email}
-                            // onChange={(e) => setUser({ ...user, email: e.target.value })}
+                            onChange={(e) => setUser({ ...user, email: e.target.value })}
                             />
                         </div>
                     </div>
@@ -119,7 +116,7 @@ const Login = () => {
                                 className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
                                 value={user.password}
 
-                            // onChange={(e) => setUser({ ...user, password: e.target.value })}
+                            onChange={(e) => setUser({ ...user, password: e.target.value })}
                             />
                         </div>
                     </div>

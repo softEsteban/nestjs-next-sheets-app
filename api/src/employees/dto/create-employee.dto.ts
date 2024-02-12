@@ -32,7 +32,7 @@ export class CreateEmployeeDto {
         example: 480,
         description: 'Employee\'s pay rate',
     })
-    @IsString()
+    @IsNumber()
     @IsNotEmpty()
     employee_pay_rate: number;
 

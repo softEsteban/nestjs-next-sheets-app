@@ -44,14 +44,6 @@ export class EmployeesService {
     return employees;
   }
 
-  // async findAllByUserId(userId: number): Promise<Employee[]> {
-  //   const employees = await this.employeeRepository.find({ where: { user_id: userId } });
-  //   if (!employees) {
-  //     throw new NotFoundException('Employees not found for the provided user ID');
-  //   }
-  //   return employees;
-  // }
-
   async findOne(id: number): Promise<Employee> {
     const employee = await this.employeeRepository.findOne({
       select: {
@@ -74,7 +66,7 @@ export class EmployeesService {
     updateEmployeeDto: UpdateEmployeeDto,
   ): Promise<Employee> {
     const employee = await this.findOne(id);
-    // this.employeeRepository.merge(employee, updateEmployeeDto);
+    this.employeeRepository.merge(employee, updateEmployeeDto);
     return await this.employeeRepository.save(employee);
   }
 

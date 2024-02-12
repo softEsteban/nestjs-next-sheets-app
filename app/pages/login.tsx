@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import { setSelectedComponent } from '@/redux/reducer';
+import { handleSuccessfulAction,handleInfoAction, handleFailedAction } from '@/utils/toastUtils';
 
 const Login = () => {
     const router = useRouter();
@@ -74,19 +75,6 @@ const Login = () => {
                 handleInfoAction("Ha habido un error en el servidor. Inténtalo de nuevo más tarde");
             }
         }
-    };
-
-
-    const handleSuccessfulAction = (message: string) => {
-        toast.success(message);
-    };
-
-    const handleInfoAction = (message: string) => {
-        toast.info(message);
-    };
-
-    const handleFailedAction = (message: string) => {
-        toast.error(message);
     };
 
     return (

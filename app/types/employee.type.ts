@@ -5,6 +5,7 @@ interface Employee {
     employee_pay_type: string;
     employee_pay_rate: number;
     employee_created_at: string;
+    user_id: number;
 }
 
 export default Employee;

@@ -27,15 +27,13 @@ export default function Home() {
                             <p className="text-sm text-gray-500">Explore different modules in the dashboard</p>
                         </div>
                         <div className="flex items-center">
-                            {/* Add button if needed */}
                         </div>
                     </section>
 
-                    <DashboardBanner/>
+                    <DashboardBanner text={"Your payrolls solution"} />
 
                     <section className="flex items-center justify-between mt-8 mb-8">
                         <h2 className="text-2xl font-semibold mb-2">Explore Modules</h2>
-                        {/* Subtitle can go here */}
                     </section>
 
                     <section className="flex flex-wrap mt-8">

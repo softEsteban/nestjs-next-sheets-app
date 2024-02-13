@@ -5,7 +5,7 @@ export let user: any;
 try {
     storedData = localStorage.getItem('userSession');
 } catch (error) {
-    console.error('Error accessing localStorage:', error);
+    console.error('Error accessing localStorage');
 }
 let userData = undefined;
 if (typeof storedData !== 'undefined' && storedData !== null) {
@@ -14,6 +14,6 @@ if (typeof storedData !== 'undefined' && storedData !== null) {
         user = userData?.user || null;
         menu = userData?.menu || null;
     } catch (error) {
-        console.error('Error parsing JSON from localStorage:', error);
+        console.error('Error parsing JSON from localStorage');
     }
 }

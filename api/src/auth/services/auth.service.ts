@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../database/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from '../dtos/login.dto';
-import { CreateUserDto } from '../../users/dto/create-user.dto';
-import { UpdateUserDto } from '../dtos/update.user.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,16 +25,14 @@ export class AuthService {
 
         if (!user) {
             // User not found
-            return { message: "User was not found" };
+            throw new NotFoundException("User was not found");
         }
 
         // Compare the provided password with the stored password hash
         const isPasswordValid = await this.comparePasswords(user_password, user.user_password);
 
         if (!isPasswordValid) {
-            // Password is incorrect
-            return { message: "Password is incorrect" };
-
+            throw new UnauthorizedException("Password is incorrect");
         }
 
         // Generate a JWT token
@@ -47,7 +43,6 @@ export class AuthService {
         return { user, token: accessToken };
     }
 
-    
     private async comparePasswords(plainPassword: string, hashedPassword: string): Promise<boolean> {
         return bcrypt.compare(plainPassword, hashedPassword);
     }

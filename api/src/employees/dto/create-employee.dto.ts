@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PayType } from 'src/types/pay.type';
 
@@ -34,6 +34,7 @@ export class CreateEmployeeDto {
     })
     @IsNumber()
     @IsNotEmpty()
+    @Min(12.00)
     employee_pay_rate: number;
 
     @ApiProperty({

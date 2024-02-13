@@ -8,12 +8,12 @@ import DashboardBanner from "@/components/DashboardBanner/DashboardBanner";
 export default function Home() {
     const router = useRouter();
 
-    const redirectToPayrolls = () => {
-        router.push("/payrolls");
-    };
-
     const redirectToEmployees = () => {
         router.push("/employees");
+    };
+
+    const redirectToPayrolls = () => {
+        router.push("/time-sheets");
     };
 
     return (
@@ -38,22 +38,21 @@ export default function Home() {
 
                     <section className="flex flex-wrap mt-8">
                         <div
-                            onClick={redirectToPayrolls}
-                            className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
-                        >
-                            <FaMoneyBillAlt className="text-white text-4xl mb-2" />
-                            <p className="text-white text-xl font-semibold">View Payrolls</p>
-                        </div>
-                        <div
                             onClick={redirectToEmployees}
-                            className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                            style={{backgroundColor: "#58387b"}} className="flex flex-col items-center justify-center mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
                         >
                             <FaUsers className="text-white text-4xl mb-2" />
                             <p className="text-white text-xl font-semibold">View Employees</p>
                         </div>
+                        <div
+                            onClick={redirectToPayrolls}
+                            style={{backgroundColor: "#58387b"}} className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                        >   
+                            <FaMoneyBillAlt className="text-white text-4xl mb-2" />
+                            <p className="text-white text-xl font-semibold">View Payrolls</p>
+                        </div>
                     </section>
 
-                    {/* Additional modules can be added here */}
 
                 </section>
             </main>

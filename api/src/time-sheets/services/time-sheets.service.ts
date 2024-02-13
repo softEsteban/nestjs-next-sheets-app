@@ -5,6 +5,8 @@ import { CreateTimeSheetDto } from '../dto/create-time-sheet.dto';
 import { UpdateTimeSheetDto } from '../dto/update-time-sheet.dto';
 import { TimeSheet } from '../../database/entities/time.sheet.entity';
 import { Employee } from '../../database/entities/employee.entity';
+import { PayType } from '../../types/pay.type';
+import { TimeSheetsStates } from 'src/types/time.sheets.states';
 
 @Injectable()
 export class TimeSheetsService {
@@ -16,27 +18,32 @@ export class TimeSheetsService {
   ) { }
 
   async create(createTimeSheetDto: CreateTimeSheetDto): Promise<TimeSheet> {
-    const { employee_id, state, hourly_rate, hours } = createTimeSheetDto;
 
-    if (hourly_rate < 12.0) {
-      throw new BadRequestException('Hourly rate must be greater than or equal to 12.00');
-    }
-
-    if (!hours) {
-      throw new BadRequestException('Hours field cannot be empty');
-    }
+    const { employee_id, hours, check_date } = createTimeSheetDto;
 
     // Fetch the corresponding Employee entity based on employee_id
     const employee = await this.employeeRepository.findOne({ where: { employee_id } });
+    const { employee_pay_type, employee_pay_rate } = employee;
+
     if (!employee) {
       throw new BadRequestException(`Employee with id ${employee_id} not found`);
     }
 
+    // Validate employee pay type and rate
+    if (employee_pay_type === PayType.HOURLY && hours === 0) {
+      throw new BadRequestException('Hours field cannot be empty for hourly pay employees');
+    }
+    if (employee_pay_type === PayType.HOURLY && (employee_pay_rate * hours) < 100) {
+      throw new BadRequestException('Hourly pay employees cannot be payed lesser than 100');
+    }
+
     const sheetTime = new TimeSheet();
-    sheetTime.employee_id = employee; // Assign Employee entity to employee_id property
-    sheetTime.state = state;
-    sheetTime.hourly_rate = hourly_rate;
-    sheetTime.hours = hours;
+
+    sheetTime.employee = employee;
+    sheetTime.state = TimeSheetsStates.PENDING;
+    sheetTime.hours = employee_pay_type === PayType.HOURLY ? hours : 40;
+    sheetTime.total_payed = employee_pay_type === PayType.HOURLY ? (employee_pay_rate * hours) : employee_pay_rate;
+    sheetTime.check_date = check_date;
 
     return await this.sheetTimeRepository.save(sheetTime);
   }

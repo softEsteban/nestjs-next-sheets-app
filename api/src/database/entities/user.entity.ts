@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Profile } from './profile.entity';
 import { Employee } from './employee.entity';
-import { UserType } from 'src/types/user.type';
+import { UserType } from '../../types/user.type';
 
 @Entity({ name: 'users', schema: 'generic' })
 

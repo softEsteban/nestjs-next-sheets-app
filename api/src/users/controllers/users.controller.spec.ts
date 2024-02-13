@@ -7,7 +7,8 @@ import { UserType } from '../../types/user.type';
 describe('UsersController', () => {
 
   let controller: UsersController;
-  const mockUserService = {
+
+  const mockUsersService = {
     create: jest.fn(dto => {
       return {
         user_id: Date.now(),
@@ -30,7 +31,7 @@ describe('UsersController', () => {
       providers: [UsersService],
     })
       .overrideProvider(UsersService)
-      .useValue(mockUserService)
+      .useValue(mockUsersService)
       .compile();
 
     controller = module.get<UsersController>(UsersController);
@@ -86,7 +87,7 @@ describe('UsersController', () => {
       user_avatar: "https://randomuser.me/api/portraits/women/1.jpg",
       profile_id: 1,
     });
-    expect(mockUserService.create).toHaveBeenCalledWith(dto);
+    expect(mockUsersService.create).toHaveBeenCalledWith(dto);
   })
 
   //Test 2
@@ -95,13 +96,13 @@ describe('UsersController', () => {
       id: 1,
       ...dto
     })
-    expect(mockUserService.update).toHaveBeenCalled();
+    expect(mockUsersService.update).toHaveBeenCalled();
   })
 
   //Test 3
   it('should return all users', async () => {
     expect(controller.findAll()).toEqual(mockUsers);
-    expect(mockUserService.findAll).toHaveBeenCalled();
+    expect(mockUsersService.findAll).toHaveBeenCalled();
   })
 
 

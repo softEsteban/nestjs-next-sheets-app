@@ -29,30 +29,6 @@ export class UsersService {
     return this.userRepository.save(createUserDto);
   }
 
-  async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { user_id: userId } });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Update user properties based on updateUserDto
-    if (updateUserDto.user_name) {
-      user.user_name = updateUserDto.user_name;
-    }
-    if (updateUserDto.user_lastname) {
-      user.user_lastname = updateUserDto.user_lastname;
-    }
-    if (updateUserDto.user_type) {
-      user.user_type = updateUserDto.user_type;
-    }
-    if (updateUserDto.user_avatar) {
-      user.user_avatar = updateUserDto.user_avatar;
-    }
-    delete user["user_password"];
-
-    return this.userRepository.save(user);
-  }
-
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({ select: ['user_id', 'user_name', 'user_lastname', 'user_type', 'user_email', 'profile_id', 'user_avatar'] });
   }
@@ -77,14 +53,46 @@ export class UsersService {
     return user;
   }
 
+  async update(userId: number, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { user_id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update user properties based on updateUserDto
+    if (updateUserDto.user_name) {
+      user.user_name = updateUserDto.user_name;
+    }
+    if (updateUserDto.user_lastname) {
+      user.user_lastname = updateUserDto.user_lastname;
+    }
+    if (updateUserDto.user_type) {
+      user.user_type = updateUserDto.user_type;
+    }
+    if (updateUserDto.user_avatar) {
+      user.user_avatar = updateUserDto.user_avatar;
+    }
+    delete user["user_password"];
+
+    return this.userRepository.save(user);
+  }
+
   async remove(id: number): Promise<void> {
-    const user = await this.findOne(id);
-    await this.userRepository.delete(user);
+    const user = await this.userRepository.findOne({
+      where: {
+        user_id: id
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+
+    await this.userRepository.remove(user);
   }
 
   private async hashPassword(password: string): Promise<string> {
     const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
   }
-
 }

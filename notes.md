@@ -12,6 +12,14 @@ npm run migration:run
 
 ---------
 
+NESTJS TESTING COMMANDS:
+
+npm run test:watch
+npm run test:e2e:watch
+
+---------
+
+
 SQL COMMANDS:
 
 CREATE DATABASE ocmiworkers_db;

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
 import { User } from './user.entity';
-import { PayType } from 'src/types/pay.type';
+import { PayType } from '../../types/pay.type';
 
 @Entity({ name: 'employees', schema: 'generic' })
 

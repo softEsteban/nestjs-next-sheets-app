@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
 import { storedData, user } from "@/utils/authUtils";
 import axios from "axios";
-import { FaExclamationTriangle, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Employee from "@/types/employee.type";
 import { formattedDate } from "@/utils/dateUtils";
 import AddUpdateEmployeeModal from "@/components/AddUpdateEmployeeModal/AddUpdateEmployeeModal";
@@ -68,11 +68,10 @@ export default function Employees() {
         // }
     };
 
-
     return (
         <>
             <AppLayout>
-                <title>Workers Management</title>
+                <title>Employees Management</title>
                 <main className="min-h-screen p-4 sm:p-8 bg-gray-100 rounded-xl">
                     <section className="mt-8">
                         <section className="flex items-center justify-between mt-8 mb-8">

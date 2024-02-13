@@ -33,9 +33,9 @@ export class TimeSheetsController {
     return this.timeSheetsService.update(+id, updateTimeSheetDto);
   }
 
-  @Patch(':id/state')
+  @Post(':id/:state')
   @ApiOperation({ summary: 'Update the state of a time sheet by ID' })
-  updateState(@Param('id') id: string, @Body('state') newState: string) {
+  updateState(@Param('id') id: string, @Param('state') newState: string) {
     return this.timeSheetsService.updateState(+id, newState);
   }
   

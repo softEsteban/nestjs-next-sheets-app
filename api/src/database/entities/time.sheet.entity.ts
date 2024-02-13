@@ -10,17 +10,17 @@ export class TimeSheet {
 
     @OneToOne(() => Employee)
     @JoinColumn({ name: 'employee_id' })
-    employee_id: Employee;
+    employee: Employee;
 
     @Column()
     state: string;
-
-    @Column()
-    hourly_rate: number;
 
     @Column()
     hours: number;
    
     @Column()
     total_payed: number;
+
+    @Column({ type: 'date' })
+    check_date: Date;
 }

@@ -1,20 +1,23 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateTimeSheetDto } from '../dto/create-time-sheet.dto';
 import { UpdateTimeSheetDto } from '../dto/update-time-sheet.dto';
 import { TimeSheet } from '../../database/entities/time.sheet.entity';
 import { Employee } from '../../database/entities/employee.entity';
 import { PayType } from '../../types/pay.type';
-import { TimeSheetsStates } from 'src/types/time.sheets.states';
+import { TimeSheetsStates } from '../../types/time.sheets.states';
+import { User } from '../../database/entities/user.entity';
 
 @Injectable()
 export class TimeSheetsService {
   constructor(
     @InjectRepository(TimeSheet)
-    private readonly sheetTimeRepository: Repository<TimeSheet>,
+    private readonly timeSheetsRepository: Repository<TimeSheet>,
     @InjectRepository(Employee)
-    private readonly employeeRepository: Repository<Employee>
+    private readonly employeeRepository: Repository<Employee>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) { }
 
   async create(createTimeSheetDto: CreateTimeSheetDto): Promise<TimeSheet> {
@@ -23,11 +26,12 @@ export class TimeSheetsService {
 
     // Fetch the corresponding Employee entity based on employee_id
     const employee = await this.employeeRepository.findOne({ where: { employee_id } });
-    const { employee_pay_type, employee_pay_rate } = employee;
 
     if (!employee) {
-      throw new BadRequestException(`Employee with id ${employee_id} not found`);
+      throw new NotFoundException(`Employee with id ${employee_id} not found`);
     }
+
+    const { employee_pay_type, employee_pay_rate } = employee;
 
     // Validate employee pay type and rate
     if (employee_pay_type === PayType.HOURLY && hours === 0) {
@@ -45,18 +49,48 @@ export class TimeSheetsService {
     sheetTime.total_payed = employee_pay_type === PayType.HOURLY ? (employee_pay_rate * hours) : employee_pay_rate;
     sheetTime.check_date = check_date;
 
-    return await this.sheetTimeRepository.save(sheetTime);
+    return await this.timeSheetsRepository.save(sheetTime);
   }
 
   async findAll(): Promise<TimeSheet[]> {
-    return await this.sheetTimeRepository.find();
+    return await this.timeSheetsRepository.find();
+  }
+
+  async findAllByUser(userId: number): Promise<TimeSheet[]> {
+    const user = await this.userRepository.findOne({
+      where: {
+        user_id: userId
+      },
+      relations: ['employees']
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    const employeeIds = user.employees.map(employee => employee.employee_id);
+    return await this.timeSheetsRepository.find({ where: { employee: In(employeeIds) }, relations: ['employee'] });
+  }
+
+  async findAllByEmployee(employeeId: number): Promise<TimeSheet[]> {
+    const employee = await this.employeeRepository.findOne({
+      where: {
+        employee_id: employeeId
+      }
+    });
+
+    if (!employee) {
+      throw new NotFoundException(`EMployee with id ${employeeId} not found`);
+    }
+    return await this.timeSheetsRepository.find({ where: { employee: employee }, relations: ['employee'] });
   }
 
   async findOne(id: number): Promise<TimeSheet> {
-    const timeSheet = await this.sheetTimeRepository.findOne({
+    const timeSheet = await this.timeSheetsRepository.findOne({
       where: {
         sheet_id: id
-      }
+      },
+      relations: ['employee']
     });
     if (!timeSheet) {
       throw new NotFoundException(`Time sheet with ID ${id} not found`);
@@ -66,18 +100,45 @@ export class TimeSheetsService {
 
   async update(id: number, updateTimeSheetDto: UpdateTimeSheetDto): Promise<TimeSheet> {
     const timeSheet = await this.findOne(id);
-    const updatedSheet = Object.assign(timeSheet, updateTimeSheetDto);
-    return await this.sheetTimeRepository.save(updatedSheet);
+    
+    if (!timeSheet) {
+      throw new NotFoundException(`Time sheet with ID ${id} not found`);
+    }
+
+    const employee = await this.employeeRepository.findOne({ where: { employee_id: timeSheet.employee.employee_id } });
+
+    if (employee.employee_pay_type === PayType.HOURLY && updateTimeSheetDto.hours != timeSheet.hours) {
+      timeSheet.hours = updateTimeSheetDto.hours;
+      timeSheet.total_payed = employee.employee_pay_rate * updateTimeSheetDto.hours;
+    }
+
+    timeSheet.check_date = updateTimeSheetDto.check_date;
+
+    return await this.timeSheetsRepository.save(timeSheet);
   }
 
   async remove(id: number): Promise<void> {
     const timeSheet = await this.findOne(id);
-    await this.sheetTimeRepository.remove(timeSheet);
+    
+    if (!timeSheet) {
+      throw new NotFoundException(`Time sheet with ID ${id} not found`);
+    }
+
+    await this.timeSheetsRepository.remove(timeSheet);
   }
 
   async updateState(id: number, newState: string): Promise<TimeSheet> {
-    const timeSheet = await this.findOne(id);
+    const timeSheet = await this.timeSheetsRepository.findOne({
+      where: {
+        sheet_id: id
+      }
+    });
+
+    if (!timeSheet) {
+      throw new NotFoundException(`Time sheet with ID ${id} not found`);
+    }
+    
     timeSheet.state = newState;
-    return await this.sheetTimeRepository.save(timeSheet);
+    return await this.timeSheetsRepository.save(timeSheet);
   }
 }

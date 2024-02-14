@@ -1,13 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { TimeSheetsService } from '../services/time-sheets.service';
 import { CreateTimeSheetDto } from '../dto/create-time-sheet.dto';
 import { UpdateTimeSheetDto } from '../dto/update-time-sheet.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { TimeSheet } from 'src/database/entities/time.sheet.entity';
 
 @ApiTags('Time Sheets')
 @Controller('time-sheets')
 export class TimeSheetsController {
-  constructor(private readonly timeSheetsService: TimeSheetsService) {}
+  constructor(private readonly timeSheetsService: TimeSheetsService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new time sheet' })
@@ -19,6 +20,18 @@ export class TimeSheetsController {
   @ApiOperation({ summary: 'Get all time sheets' })
   findAll() {
     return this.timeSheetsService.findAll();
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get all time sheets for a user' })
+  async findAllByUser(@Param('userId') userId: number): Promise<TimeSheet[]> {
+    return await this.timeSheetsService.findAllByUser(userId); 
+  }
+
+  @Get('employee/:employeeId')
+  @ApiOperation({ summary: 'Get all time sheets for a user' })
+  async findAllByEmployee(@Param('employeeId') employeeId: number): Promise<TimeSheet[]> {
+    return await this.timeSheetsService.findAllByEmployee(employeeId); 
   }
 
   @Get(':id')
@@ -38,7 +51,7 @@ export class TimeSheetsController {
   updateState(@Param('id') id: string, @Param('state') newState: string) {
     return this.timeSheetsService.updateState(+id, newState);
   }
-  
+
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a time sheet by ID' })
   remove(@Param('id') id: string) {

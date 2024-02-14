@@ -1,3 +1,15 @@
+CHALLENGE PLAN:
+
+* Specify requirements
+* Build database from entities and migrations
+* Build services and test cases
+* Build app and test cases
+* Diagram database structure and app architecture
+* Test through Sonarqube
+
+---------
+
+
 CHALLENGE SPECIFICATIONS:
 
 * Gist - [https://gist.github.com/CristianHG2/ecb23035b7551c3067f51a163bf5c753](https://gist.github.com/CristianHG2/ecb23035b7551c3067f51a163bf5c753)

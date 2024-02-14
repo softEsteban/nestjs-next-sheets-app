@@ -3,12 +3,12 @@ import { FaUserCircle, FaLock } from 'react-icons/fa';
 import '../app/globals.css';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import { setSelectedComponent } from '@/redux/reducer';
-import { handleSuccessfulAction,handleInfoAction, handleFailedAction } from '@/utils/toastUtils';
+import { handleSuccessfulAction, handleInfoAction, handleFailedAction } from '@/utils/toastUtils';
 
 const Login = () => {
     const router = useRouter();

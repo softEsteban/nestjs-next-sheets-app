@@ -16,12 +16,21 @@ export class CreateTimeSheetDto {
     description: 'Employee\'s hours, when hourly based',
   })
   @IsNumber()
-  hours: number;
+  sheet_hours: number;
+
+  @ApiProperty({
+    example: 0,
+    description: 'Employee\'s pay rate',
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  sheet_pay_rate: number;
 
   @ApiProperty({
     example: '2024-02-20',
     description: 'Pay date',
   })
   @IsDateString()
-  check_date: Date;
+  @IsNotEmpty()
+  sheet_check_date: Date;
 }

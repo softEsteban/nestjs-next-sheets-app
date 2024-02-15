@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { User } from './user.entity';
 import { PayType } from '../../types/pay.type';
+import { TimeSheet } from './time.sheet.entity';
 
 @Entity({ name: 'employees', schema: 'generic' })
 
@@ -27,4 +28,7 @@ export class Employee {
     @ManyToOne(() => User, user => user.employees)
     @JoinColumn({ name: 'user_id' })
     user: User;
+
+    @OneToMany(() => TimeSheet, time_sheet => time_sheet.employee)
+    time_sheets: TimeSheet[];
 }

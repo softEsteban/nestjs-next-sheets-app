@@ -8,12 +8,14 @@ import { CreateTimeSheetDto } from '../dto/create-time-sheet.dto';
 import { PayType } from '../../types/pay.type';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { User } from '../../database/entities/user.entity';
+import { MinWages } from 'src/database/entities/min.wages.entity';
 
 describe('TimeSheetsService', () => {
   let service: TimeSheetsService;
   let timeSheetsRepository: Repository<TimeSheet>;
   let employeeRepository: Repository<Employee>;
   let userRepository: Repository<User>;
+  let minWagesRepository: Repository<MinWages>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +32,12 @@ describe('TimeSheetsService', () => {
         {
           provide: getRepositoryToken(User),
           useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(MinWages),
+          useValue: {
+            find: jest.fn().mockResolvedValue([{ wage_name: 'Hour', wage_value: 12 }, { wage_name: 'Salary', wage_value: 480 }])
+          },
         }
       ],
     }).compile();
@@ -68,8 +76,9 @@ describe('TimeSheetsService', () => {
   };
   const createTimeSheet: CreateTimeSheetDto = {
     employee_id: 1,
-    check_date: new Date(),
-    hours: 10
+    sheet_check_date: new Date(),
+    sheet_hours: 10,
+    sheet_pay_rate: 39
   };
   const mockCreatedTimeSheet: TimeSheet = {
     sheet_id: 1,
@@ -98,10 +107,11 @@ describe('TimeSheetsService', () => {
         employees: []
       }
     },
-    hours: 10,
-    state: "pending",
-    total_payed: 1000,
-    check_date: new Date()
+    sheet_hours: 10,
+    sheet_state: "pending",
+    sheet_total_payed: 1000,
+    sheet_check_date: new Date(),
+    sheet_pay_rate: 39
   };
   const mockEmployeeHourly = {
     employee_id: 1,
@@ -156,28 +166,31 @@ describe('TimeSheetsService', () => {
   const mockTimeSheets: TimeSheet[] = [
     {
       sheet_id: 3,
-      state: "pending",
-      hours: 0,
-      total_payed: 480,
-      check_date: new Date(),
-      employee: mockEmployee
+      sheet_state: "pending",
+      sheet_hours: 0,
+      sheet_total_payed: 480,
+      sheet_check_date: new Date(),
+      employee: mockEmployee,
+      sheet_pay_rate: 39
     },
     {
       sheet_id: 4,
-      state: "pending",
-      hours: 14,
-      total_payed: 210,
-      check_date: new Date(),
-      employee: mockEmployee
+      sheet_state: "pending",
+      sheet_hours: 14,
+      sheet_total_payed: 210,
+      sheet_check_date: new Date(),
+      employee: mockEmployee,
+      sheet_pay_rate: 39
     }
   ];
   const mockUpdatedSheet = {
     sheet_id: 3,
-    state: "approved",
-    hours: 0,
-    total_payed: 480,
-    check_date: new Date(),
-    employee: mockEmployee
+    sheet_state: "approved",
+    sheet_hours: 0,
+    sheet_total_payed: 480,
+    sheet_check_date: new Date(),
+    employee: mockEmployee,
+    sheet_pay_rate: 39
   };
 
   it('should be defined', () => {
@@ -211,7 +224,7 @@ describe('TimeSheetsService', () => {
       const createDto = {
         ...createTimeSheet
       };
-      createDto.hours = 0;
+      createDto.sheet_hours = 0;
 
       await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
     });
@@ -223,9 +236,6 @@ describe('TimeSheetsService', () => {
       await expect(service.create(createTimeSheet)).rejects.toThrow(BadRequestException);
     });
 
-  });
-
-  describe('create time sheet', () => {
   });
 
   describe('get all time sheets and by ID', () => {
@@ -320,21 +330,22 @@ describe('TimeSheetsService', () => {
       const timeSheetId = 2;
       const newState = "approved";
       const mockTimeSheet = {
-        sheet_id: 2, 
-        state: "pending",
-        hours: 0,
-        total_payed: 480,
-        check_date: new Date(),
-        employee: mockEmployee
+        sheet_id: 2,
+        sheet_state: "pending",
+        sheet_hours: 0,
+        sheet_total_payed: 480,
+        sheet_check_date: new Date(),
+        employee: mockEmployee,
+        sheet_pay_rate: 32
       };
-  
+
       jest.spyOn(timeSheetsRepository, 'findOne').mockResolvedValue(mockTimeSheet);
-      jest.spyOn(timeSheetsRepository, 'save').mockResolvedValue({ ...mockTimeSheet, state: newState }); 
-  
+      jest.spyOn(timeSheetsRepository, 'save').mockResolvedValue({ ...mockTimeSheet, sheet_state: newState });
+
       await service.updateState(timeSheetId, newState);
-  
+
       expect(timeSheetsRepository.findOne).toHaveBeenCalledWith({ where: { sheet_id: timeSheetId } });
-      expect(timeSheetsRepository.save).toHaveBeenCalledWith({ ...mockTimeSheet, state: newState }); 
+      expect(timeSheetsRepository.save).toHaveBeenCalledWith({ ...mockTimeSheet, state: newState });
     });
   });
 

@@ -8,6 +8,7 @@ import { Employee } from '../../database/entities/employee.entity';
 import { PayType } from '../../types/pay.type';
 import { TimeSheetsStates } from '../../types/time.sheets.states';
 import { User } from '../../database/entities/user.entity';
+import { MinWages } from 'src/database/entities/min.wages.entity';
 
 @Injectable()
 export class TimeSheetsService {
@@ -17,12 +18,14 @@ export class TimeSheetsService {
     @InjectRepository(Employee)
     private readonly employeeRepository: Repository<Employee>,
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(MinWages)
+    private readonly minWagesRepository: Repository<MinWages>
   ) { }
 
   async create(createTimeSheetDto: CreateTimeSheetDto): Promise<TimeSheet> {
 
-    const { employee_id, hours, check_date } = createTimeSheetDto;
+    const { employee_id, sheet_hours, sheet_check_date, sheet_pay_rate } = createTimeSheetDto;
 
     // Fetch the corresponding Employee entity based on employee_id
     const employee = await this.employeeRepository.findOne({ where: { employee_id } });
@@ -31,29 +34,56 @@ export class TimeSheetsService {
       throw new NotFoundException(`Employee with id ${employee_id} not found`);
     }
 
-    const { employee_pay_type, employee_pay_rate } = employee;
+    const { employee_pay_type } = employee;
+
+    // Retrieve minimum wage values from the repository
+    const minWages = await this.minWagesRepository.find();
+
+    // Determine minimum wage values for salary and hourly pay types
+    const salaryMinWage = minWages.find(wage => wage.wage_name === 'Salary')?.wage_value;
+    const hourlyMinWage = minWages.find(wage => wage.wage_name === 'Hour')?.wage_value;
+
+    if (employee_pay_type === PayType.SALARY && sheet_pay_rate < salaryMinWage) {
+      throw new BadRequestException(`Salary type employees pay rate should be equal or greater than ${salaryMinWage} per check`);
+    }
+
+    if (employee_pay_type === PayType.HOURLY && sheet_pay_rate < hourlyMinWage) {
+      throw new BadRequestException(`Hourly type employees pay rate should be equal or greater than ${hourlyMinWage} per hour`);
+    }
 
     // Validate employee pay type and rate
-    if (employee_pay_type === PayType.HOURLY && hours === 0) {
+    if (employee_pay_type === PayType.HOURLY && sheet_hours === 0) {
       throw new BadRequestException('Hours field cannot be empty for hourly pay employees');
     }
-    if (employee_pay_type === PayType.HOURLY && (employee_pay_rate * hours) < 100) {
+    if (employee_pay_type === PayType.HOURLY && (sheet_pay_rate * sheet_hours) < 100) {
       throw new BadRequestException('Hourly pay employees cannot be payed lesser than 100');
     }
 
     const sheetTime = new TimeSheet();
 
-    sheetTime.employee = employee;
-    sheetTime.state = TimeSheetsStates.PENDING;
-    sheetTime.hours = employee_pay_type === PayType.HOURLY ? hours : 40;
-    sheetTime.total_payed = employee_pay_type === PayType.HOURLY ? (employee_pay_rate * hours) : employee_pay_rate;
-    sheetTime.check_date = check_date;
+    if (employee_pay_type === PayType.HOURLY) {
+      sheetTime.employee = employee;
+      sheetTime.sheet_state = TimeSheetsStates.PENDING;
+      sheetTime.sheet_total_payed = sheet_pay_rate * sheet_hours;
+      sheetTime.sheet_check_date = sheet_check_date;
+      sheetTime.sheet_pay_rate = sheet_pay_rate;
+      sheetTime.sheet_hours = sheet_hours;
+    }
+
+    if (employee_pay_type === PayType.SALARY) {
+      sheetTime.employee = employee;
+      sheetTime.sheet_state = TimeSheetsStates.PENDING;
+      sheetTime.sheet_total_payed = sheet_pay_rate;
+      sheetTime.sheet_check_date = sheet_check_date;
+      sheetTime.sheet_pay_rate = sheet_pay_rate;
+      sheetTime.sheet_hours = 40;
+    }
 
     return await this.timeSheetsRepository.save(sheetTime);
   }
 
   async findAll(): Promise<TimeSheet[]> {
-    return await this.timeSheetsRepository.find();
+    return await this.timeSheetsRepository.find({ relations: ['employee'] });
   }
 
   async findAllByUser(userId: number): Promise<TimeSheet[]> {
@@ -99,27 +129,49 @@ export class TimeSheetsService {
   }
 
   async update(id: number, updateTimeSheetDto: UpdateTimeSheetDto): Promise<TimeSheet> {
+    const { sheet_hours, sheet_check_date, sheet_pay_rate } = updateTimeSheetDto;
+
     const timeSheet = await this.findOne(id);
-    
+
     if (!timeSheet) {
       throw new NotFoundException(`Time sheet with ID ${id} not found`);
     }
 
     const employee = await this.employeeRepository.findOne({ where: { employee_id: timeSheet.employee.employee_id } });
+    const { employee_pay_type } = employee;
 
-    if (employee.employee_pay_type === PayType.HOURLY && updateTimeSheetDto.hours != timeSheet.hours) {
-      timeSheet.hours = updateTimeSheetDto.hours;
-      timeSheet.total_payed = employee.employee_pay_rate * updateTimeSheetDto.hours;
+    // Retrieve minimum wage values from the repository
+    const minWages = await this.minWagesRepository.find();
+
+    // Determine minimum wage values for salary and hourly pay types
+    const salaryMinWage = minWages.find(wage => wage.wage_name === 'Salary')?.wage_value;
+    const hourlyMinWage = minWages.find(wage => wage.wage_name === 'Hour')?.wage_value;
+
+    if (employee_pay_type === PayType.SALARY && sheet_pay_rate < salaryMinWage) {
+      throw new BadRequestException(`Salary type employees pay rate should be equal or greater than ${salaryMinWage} per check`);
     }
 
-    timeSheet.check_date = updateTimeSheetDto.check_date;
+    if (employee_pay_type === PayType.HOURLY && sheet_pay_rate < hourlyMinWage) {
+      throw new BadRequestException(`Hourly type employees pay rate should be equal or greater than ${hourlyMinWage} per hour`);
+    }
+
+    if (employee_pay_type === PayType.HOURLY && updateTimeSheetDto.sheet_hours != timeSheet.sheet_hours) {
+      timeSheet.sheet_hours = sheet_hours;
+      timeSheet.sheet_total_payed = sheet_pay_rate * sheet_hours;
+    }
+
+    if (employee_pay_type === PayType.SALARY) {
+      timeSheet.sheet_total_payed = sheet_pay_rate;
+    }
+
+    timeSheet.sheet_check_date = sheet_check_date;
 
     return await this.timeSheetsRepository.save(timeSheet);
   }
 
   async remove(id: number): Promise<void> {
     const timeSheet = await this.findOne(id);
-    
+
     if (!timeSheet) {
       throw new NotFoundException(`Time sheet with ID ${id} not found`);
     }
@@ -137,8 +189,8 @@ export class TimeSheetsService {
     if (!timeSheet) {
       throw new NotFoundException(`Time sheet with ID ${id} not found`);
     }
-    
-    timeSheet.state = newState;
+
+    timeSheet.sheet_state = newState;
     return await this.timeSheetsRepository.save(timeSheet);
   }
 }

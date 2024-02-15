@@ -65,14 +65,12 @@ const Login = () => {
 
         } catch (error: any) {
             const response = error?.response.data;
-            if (response.error === "User does not exist") {
-                handleFailedAction("El usuario no existe");
-            } else if (response.error === "Invalid credentials") {
-                handleFailedAction("La contraseña es incorrecta");
-            } else if (response.error === "User has not confirm email yet") {
-                handleFailedAction("El correo no ha sido confirmado");
+            if (response.message === "User was not found") {
+                handleFailedAction("User was not found");
+            } else if (response.message === "Invalid credentials") {
+                handleFailedAction("Invalid password");
             } else {
-                handleInfoAction("Ha habido un error en el servidor. Inténtalo de nuevo más tarde");
+                handleInfoAction("There has been a server error. Try later, please!");
             }
         }
     };

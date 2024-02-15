@@ -1,0 +1,111 @@
+import Employee from "@/types/employee.type";
+import { storedData, user } from "@/utils/authUtils";
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+export default function TimeSheets() {
+
+    const [employees, setEmployees] = useState<Employee[]>([]);
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee>();
+    const isAdmin = user?.user_type === 'admin';
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let url = isAdmin ? `${process.env.NEXT_PUBLIC_HOST}/employees` : `${process.env.NEXT_PUBLIC_HOST}/employees/user/${user.user_id}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${storedData?.token}`
+                    }
+                });
+                setEmployees(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, []);
+
+    // Form validations and inputs
+    // const [validationMessage, setValidationMessage] = useState<string>('');
+
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+
+        const formData = {
+            employee_id: selectedEmployee?.employee_id,
+            sheet_hours: e.target.totalHours?.value || 0,
+            sheet_check_date: e.target.checkDate?.value,
+            sheet_salary_rate: selectedEmployee?.employee_pay_type === "hourly" ? e.target.hourlyRate?.value : e.target.salaryRate?.value
+        };
+        console.log(formData);
+
+        try {
+            // const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/submit-time-sheet`, formData, {
+            //     headers: {
+            //         Authorization: `Bearer ${storedData?.token}`
+            //     }
+            // });
+            // console.log('Form submitted successfully:', response.data);
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        }
+    };
+
+    return (
+        <>
+            <h2 className="text-xl font-semibold mb-4">Create Time Sheet</h2>
+            <form className="flex flex-wrap gap-4 justify-between items-end h-full" onSubmit={handleSubmit}>
+                <div className="w-full sm:w-auto">
+                    <label htmlFor="employee" className="block text-sm font-medium text-gray-700">Select Employee</label>
+                    <select
+                        id="employee"
+                        name="employee"
+                        value={selectedEmployee?.employee_id}
+                        onChange={(e) => {
+                            const selectedId = parseInt(e.target.value);
+                            const employee = employees.find(emp => emp.employee_id === selectedId);
+                            setSelectedEmployee(employee);
+                        }}
+                        className="mt-1 block w-full sm:w-48 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    >
+                        <option>
+                            Select an employee
+                        </option>
+                        {employees.map(employee => (
+                            <option key={employee.employee_id} value={employee.employee_id}>
+                                {employee.employee_name} {employee.employee_lastname}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+                {selectedEmployee && selectedEmployee.employee_pay_type === "hourly" ? (
+                    <>
+                        <div className="w-full sm:w-48">
+                            <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700">Hourly Rate</label>
+                            <input type="text" name="hourlyRate" id="hourlyRate" value={selectedEmployee.employee_pay_rate} className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                        </div>
+                        <div className="w-full sm:w-48">
+                            <label htmlFor="totalHours" className="block text-sm font-medium text-gray-700">Total Hours</label>
+                            <input type="text" name="totalHours" id="totalHours" className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                        </div>
+                    </>
+                ) : (
+                    <div className="w-full sm:w-48">
+                        <label htmlFor="salaryRate" className="block text-sm font-medium text-gray-700">Salary Rate</label>
+                        <input type="number" name="salaryRate" id="salaryRate" value={selectedEmployee?.employee_pay_rate} className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                    </div>
+                )}
+                <div className="w-full sm:w-48">
+                    <label htmlFor="checkDate" className="block text-sm font-medium text-gray-700">Check Date</label>
+                    <input type="date" name="checkDate" id="checkDate" className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                </div>
+                <div className="w-full sm:w-auto">
+                    <button type="submit" className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Send
+                    </button>
+                </div>
+            </form>
+        </>
+    )
+}

@@ -13,6 +13,7 @@ SELECT * FROM generic.sheet_times;
 SELECT * FROM generic.minimum_wages;
 
 
+
 -- Timesheets by user
 SELECT * FROM generic.sheet_times times 
 INNER JOIN generic.employees empl

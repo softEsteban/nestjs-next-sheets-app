@@ -25,13 +25,13 @@ export class TimeSheetsController {
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get all time sheets for a user' })
   async findAllByUser(@Param('userId') userId: number): Promise<TimeSheet[]> {
-    return await this.timeSheetsService.findAllByUser(userId); 
+    return await this.timeSheetsService.findAllByUserId(userId); 
   }
 
   @Get('employee/:employeeId')
   @ApiOperation({ summary: 'Get all time sheets for a user' })
-  async findAllByEmployee(@Param('employeeId') employeeId: number): Promise<TimeSheet[]> {
-    return await this.timeSheetsService.findAllByEmployee(employeeId); 
+  async findAllByEmployeeId(@Param('employeeId') employeeId: number): Promise<TimeSheet[]> {
+    return await this.timeSheetsService.findAllByEmployeeId(employeeId); 
   }
 
   @Get(':id')

@@ -8,7 +8,7 @@ import { Employee } from '../../database/entities/employee.entity';
 import { PayType } from '../../types/pay.type';
 import { TimeSheetsStates } from '../../types/time.sheets.states';
 import { User } from '../../database/entities/user.entity';
-import { MinWages } from 'src/database/entities/min.wages.entity';
+import { MinWages } from '../../database/entities/min.wages.entity';
 
 @Injectable()
 export class TimeSheetsService {
@@ -46,7 +46,6 @@ export class TimeSheetsService {
     if (employee_pay_type === PayType.SALARY && sheet_pay_rate < salaryMinWage) {
       throw new BadRequestException(`Salary type employees pay rate should be equal or greater than ${salaryMinWage} per check`);
     }
-
     if (employee_pay_type === PayType.HOURLY && sheet_pay_rate < hourlyMinWage) {
       throw new BadRequestException(`Hourly type employees pay rate should be equal or greater than ${hourlyMinWage} per hour`);
     }
@@ -86,7 +85,7 @@ export class TimeSheetsService {
     return await this.timeSheetsRepository.find({ relations: ['employee'] });
   }
 
-  async findAllByUser(userId: number): Promise<TimeSheet[]> {
+  async findAllByUserId(userId: number): Promise<TimeSheet[]> {
     const user = await this.userRepository.findOne({
       where: {
         user_id: userId
@@ -102,7 +101,7 @@ export class TimeSheetsService {
     return await this.timeSheetsRepository.find({ where: { employee: In(employeeIds) }, relations: ['employee'] });
   }
 
-  async findAllByEmployee(employeeId: number): Promise<TimeSheet[]> {
+  async findAllByEmployeeId(employeeId: number): Promise<TimeSheet[]> {
     const employee = await this.employeeRepository.findOne({
       where: {
         employee_id: employeeId
@@ -168,17 +167,7 @@ export class TimeSheetsService {
 
     return await this.timeSheetsRepository.save(timeSheet);
   }
-
-  async remove(id: number): Promise<void> {
-    const timeSheet = await this.findOne(id);
-
-    if (!timeSheet) {
-      throw new NotFoundException(`Time sheet with ID ${id} not found`);
-    }
-
-    await this.timeSheetsRepository.remove(timeSheet);
-  }
-
+  
   async updateState(id: number, newState: string): Promise<TimeSheet> {
     const timeSheet = await this.timeSheetsRepository.findOne({
       where: {
@@ -192,5 +181,15 @@ export class TimeSheetsService {
 
     timeSheet.sheet_state = newState;
     return await this.timeSheetsRepository.save(timeSheet);
+  }
+
+  async remove(id: number): Promise<void> {
+    const timeSheet = await this.findOne(id);
+
+    if (!timeSheet) {
+      throw new NotFoundException(`Time sheet with ID ${id} not found`);
+    }
+
+    await this.timeSheetsRepository.remove(timeSheet);
   }
 }

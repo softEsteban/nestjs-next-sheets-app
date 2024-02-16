@@ -54,7 +54,8 @@ describe('EmployeesController', () => {
       user_avatar: "",
       employees: []
     },
-    employee_created_at: new Date(), // Add employee_created_at
+    time_sheets: [],
+    employee_created_at: new Date()
   };
   const createEmployeeDto: CreateEmployeeDto = {
     employee_name: "John",
@@ -63,7 +64,7 @@ describe('EmployeesController', () => {
     employee_pay_type: PayType.HOURLY,
     user_id: 1
   };
-  const updatedEmployee = {
+  const updatedEmployee: Employee = {
     employee_id: 1,
     employee_name: 'John Edited',
     employee_lastname: 'Doe',
@@ -86,7 +87,8 @@ describe('EmployeesController', () => {
         profile_name: ""
       },
       employees: []
-    }
+    },
+    time_sheets: []
   };
   const employees: Employee[] = [mockEmployee];
 

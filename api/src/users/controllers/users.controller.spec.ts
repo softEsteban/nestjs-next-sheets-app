@@ -5,7 +5,6 @@ import { UserType } from '../../types/user.type';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from 'src/database/entities/user.entity';
 
-
 describe('UsersController', () => {
 
   let controller: UsersController;

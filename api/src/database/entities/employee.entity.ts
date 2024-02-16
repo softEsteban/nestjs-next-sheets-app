@@ -17,7 +17,7 @@ export class Employee {
     employee_lastname: string;
 
     @Column({ type: 'enum', enum: PayType, default: PayType.SALARY })
-    employee_pay_type: string;
+    employee_pay_type: PayType;
 
     @Column()
     employee_pay_rate: number;

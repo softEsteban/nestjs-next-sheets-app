@@ -85,14 +85,22 @@ describe('EmployeesService', () => {
         profile_name: ""
       },
       employees: [],
-    }
+    },
+    time_sheets: []
   };
-  const createEmployeeDto: CreateEmployeeDto = {
+  const createEmployeeSalaryDto: CreateEmployeeDto = {
     user_id: 1,
     employee_name: 'John',
     employee_lastname: 'Doe',
     employee_pay_type: PayType.SALARY,
     employee_pay_rate: 500
+  };
+  const createEmployeeHourlyDto: CreateEmployeeDto = {
+    user_id: 1,
+    employee_name: 'John',
+    employee_lastname: 'Doe',
+    employee_pay_type: PayType.HOURLY,
+    employee_pay_rate: 10
   };
   const updatedEmployee = {
     employee_id: 1,
@@ -117,7 +125,8 @@ describe('EmployeesService', () => {
         profile_name: ""
       },
       employees: []
-    }
+    },
+    time_sheets: []
   };
   const mockEmployees: Employee[] = [
     {
@@ -143,7 +152,8 @@ describe('EmployeesService', () => {
           profile_name: ""
         },
         employees: [],
-      }
+      },
+      time_sheets: []
     },
     {
       employee_id: 2,
@@ -168,7 +178,8 @@ describe('EmployeesService', () => {
           profile_name: ""
         },
         employees: [],
-      }
+      },
+      time_sheets: []
     }
   ];
 
@@ -182,19 +193,20 @@ describe('EmployeesService', () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
 
       const mockCreatedEmployee = {
-        employee_name: createEmployeeDto.employee_name,
-        employee_lastname: createEmployeeDto.employee_lastname,
-        employee_pay_type: createEmployeeDto.employee_pay_type,
-        employee_pay_rate: createEmployeeDto.employee_pay_rate,
+        employee_name: createEmployeeSalaryDto.employee_name,
+        employee_lastname: createEmployeeSalaryDto.employee_lastname,
+        employee_pay_type: createEmployeeSalaryDto.employee_pay_type,
+        employee_pay_rate: createEmployeeSalaryDto.employee_pay_rate,
         employee_created_at: new Date(),
         user: mockUser,
-        employee_id: 1
+        employee_id: 1,
+        time_sheets: []
       };
 
       jest.spyOn(employeeRepository, 'create').mockReturnValue(mockCreatedEmployee);
       jest.spyOn(employeeRepository, 'save').mockResolvedValue(mockCreatedEmployee);
 
-      const result = await service.create(createEmployeeDto);
+      const result = await service.create(createEmployeeSalaryDto);
 
       expect(result).toEqual(mockCreatedEmployee);
     });
@@ -203,54 +215,30 @@ describe('EmployeesService', () => {
 
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(service.create(createEmployeeDto)).rejects.toThrow(NotFoundException);
+      await expect(service.create(createEmployeeSalaryDto)).rejects.toThrow(NotFoundException);
     });
 
     it('should return BadRequestException when pay rate for hourly employee is lesser than minimum hour wage', async () => {
 
-      const mockProfile = {
-        profile_id: 1,
-        profile_name: 'Mock Profile',
-        profile_config: {}
-      };
-
-      const mockUser = new User();
-      mockUser.user_id = 1;
-      mockUser.user_name = 'John';
-      mockUser.user_lastname = 'Doe';
-      mockUser.user_type = UserType.CLIENT;
-      mockUser.user_email = 'john.doe@example.com';
-      mockUser.user_password = 'password123';
-      mockUser.user_created_at = new Date();
-      mockUser.profile_id = 1;
-      mockUser.user_avatar = 'avatar.jpg';
-      mockUser.profile = mockProfile;
-      mockUser.employees = [];
-
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockUser);
+
       jest.spyOn(minWagesRepository, 'find').mockResolvedValue([{ wage_id: 2, wage_name: 'Hour', wage_value: 12 }]);
 
-      const createEmployeeDto: CreateEmployeeDto = {
-        user_id: 1,
-        employee_name: 'John',
-        employee_lastname: 'Doe',
-        employee_pay_type: PayType.HOURLY,
-        employee_pay_rate: 10
-      };
-
-      const mockCreatedEmployee = new Employee();
-      mockCreatedEmployee.employee_name = createEmployeeDto.employee_name;
-      mockCreatedEmployee.employee_lastname = createEmployeeDto.employee_lastname;
-      mockCreatedEmployee.employee_pay_type = createEmployeeDto.employee_pay_type;
-      mockCreatedEmployee.employee_pay_rate = createEmployeeDto.employee_pay_rate;
-      mockCreatedEmployee.employee_created_at = new Date();
-      mockCreatedEmployee.user = mockUser;
-      mockCreatedEmployee.employee_id = 1;
+      const mockCreatedEmployee = {
+        employee_name : createEmployeeHourlyDto.employee_name,
+        employee_lastname : createEmployeeHourlyDto.employee_lastname,
+        employee_pay_type : createEmployeeHourlyDto.employee_pay_type,
+        employee_pay_rate : createEmployeeHourlyDto.employee_pay_rate,
+        employee_created_at : new Date(),
+        user : mockUser,
+        employee_id : 1,
+        time_sheets: []
+      }
 
       jest.spyOn(employeeRepository, 'create').mockReturnValue(mockCreatedEmployee);
       jest.spyOn(employeeRepository, 'save').mockResolvedValue(mockCreatedEmployee);
 
-      await expect(service.create(createEmployeeDto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(createEmployeeHourlyDto)).rejects.toThrow(BadRequestException);
     });
 
     it('should return BadRequestException when pay rate for salary employee is lesser than minimum salary wage', async () => {
@@ -354,7 +342,7 @@ describe('EmployeesService', () => {
 
     it('should throw NotFoundException if no employee is found for the provided ID', async () => {
       const employeeId = 2;
-   
+
       jest.spyOn(employeeRepository, 'findOne').mockResolvedValue(null);
 
       await expect(service.update(employeeId, updatedEmployee)).rejects.toThrow(NotFoundException);
@@ -364,7 +352,7 @@ describe('EmployeesService', () => {
   describe('remove employee', () => {
     it('should remove employee by Id', async () => {
       const employeedId = 2;
-     
+
       jest.spyOn(employeeRepository, 'findOne').mockResolvedValue(mockEmployee);
 
       jest.spyOn(employeeRepository, 'remove').mockResolvedValue(null);

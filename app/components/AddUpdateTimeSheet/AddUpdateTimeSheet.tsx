@@ -1,5 +1,5 @@
 import Employee from "@/types/employee.type";
-import { storedData, user } from "@/utils/authUtils";
+import { user, token } from "@/utils/authUtils";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,7 +15,7 @@ export default function AddUpdateTimeSheet({ handleAddTimeSheet }: any) {
                 let url = isAdmin ? `${process.env.NEXT_PUBLIC_HOST}/employees` : `${process.env.NEXT_PUBLIC_HOST}/employees/user/${user.user_id}`;
                 const response = await axios.get(url, {
                     headers: {
-                        Authorization: `Bearer ${storedData?.token}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 setEmployees(response.data);
@@ -33,17 +33,17 @@ export default function AddUpdateTimeSheet({ handleAddTimeSheet }: any) {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
 
-        if (selectedEmployee?.employee_pay_type === 'salary') {
-            if (!selectedEmployee?.employee_id || e.target.totalHours?.value || e.target.checkDate?.value || e.target.salaryRate?.value) {
-                setValidationMessage("All fields must be filled to create the time sheet");
-                return;
-            }
-        } else {
-            if (!selectedEmployee?.employee_id || e.target.totalHours?.value || e.target.checkDate?.value || e.target.hourlyRate?.value) {
-                setValidationMessage("All fields must be filled to create the time sheet");
-                return;
-            }
-        }
+        // if (selectedEmployee?.employee_pay_type === 'salary') {
+        //     if (!selectedEmployee?.employee_id || e.target.totalHours?.value || e.target.checkDate?.value || e.target.salaryRate?.value) {
+        //         setValidationMessage("All fields must be filled to create the time sheet");
+        //         return;
+        //     }
+        // } else {
+        //     if (!selectedEmployee?.employee_id || e.target.totalHours?.value || e.target.checkDate?.value || e.target.hourlyRate?.value) {
+        //         setValidationMessage("All fields must be filled to create the time sheet");
+        //         return;
+        //     }
+        // }
 
         const formData = {
             employee_id: selectedEmployee?.employee_id,
@@ -54,7 +54,7 @@ export default function AddUpdateTimeSheet({ handleAddTimeSheet }: any) {
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/time-sheets`, formData, {
                 headers: {
-                    Authorization: `Bearer ${storedData?.token}`
+                    Authorization: `Bearer ${token}`
                 }
             });
             formRef.current?.reset();

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
-import { storedData, user } from "@/utils/authUtils";
+import { user, token } from "@/utils/authUtils";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
 import Employee from "@/types/employee.type";
@@ -20,7 +20,7 @@ export default function Employees() {
                 let url = isAdmin ? `${process.env.NEXT_PUBLIC_HOST}/employees` : `${process.env.NEXT_PUBLIC_HOST}/employees/user/${user.user_id}`;
                 const response = await axios.get(url, {
                     headers: {
-                        Authorization: `Bearer ${storedData?.token}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 setEmployees(response.data);

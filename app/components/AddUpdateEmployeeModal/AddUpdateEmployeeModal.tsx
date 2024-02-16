@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import './styles.css';
 import Employee from "@/types/employee.type";
-import { storedData } from "@/utils/authUtils";
+import { storedData, token } from "@/utils/authUtils";
 import PayType from "@/types/pay.type.enum";
 
 interface AddUpdateEmployeeFormProps {
@@ -63,7 +63,7 @@ const AddUpdateEmployeeForm: React.FC<AddUpdateEmployeeFormProps> = ({ handleClo
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${storedData?.token}`
+                        Authorization: `Bearer ${token}`
                     },
                     body: JSON.stringify(employeeDataStringified),
                 });
@@ -72,7 +72,7 @@ const AddUpdateEmployeeForm: React.FC<AddUpdateEmployeeFormProps> = ({ handleClo
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${storedData?.token}`
+                        Authorization: `Bearer ${token}`
                     },
                     body: JSON.stringify(employeeDataStringified),
                 });

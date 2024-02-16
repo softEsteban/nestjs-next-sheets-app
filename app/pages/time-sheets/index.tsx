@@ -1,10 +1,30 @@
 import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
-import { storedData, user } from "@/utils/authUtils";
+import { user, token } from "@/utils/authUtils";
 import axios from "axios";
 import AddUpdateTimeSheet from "@/components/AddUpdateTimeSheet/AddUpdateTimeSheet";
 import NoData from "@/components/NoData/NoData";
 import TimeSheet from "@/types/time.sheet.type";
+
+const TimeSheetState = ({ sheet_state }: any) => {
+    let badgeClasses = 'px-2 py-1 inline-block rounded-full ';
+
+    if (sheet_state === 'pending') {
+        badgeClasses += 'bg-yellow-300 text-white';
+    } else if (sheet_state === 'approved') {
+        badgeClasses += 'bg-green-300 text-white';
+    } else if (sheet_state === 'declined') {
+        badgeClasses += 'bg-red-300 text-white';
+    }
+
+    return (
+        <td className="px-6 py-4 whitespace-nowrap">
+            <span className={badgeClasses}>
+                {sheet_state}
+            </span>
+        </td>
+    );
+};
 
 export default function TimeSheets() {
 
@@ -17,7 +37,7 @@ export default function TimeSheets() {
                 let url = isAdmin ? `${process.env.NEXT_PUBLIC_HOST}/time-sheets` : `${process.env.NEXT_PUBLIC_HOST}/time-sheets/user/${user.user_id}`;
                 const response = await axios.get(url, {
                     headers: {
-                        Authorization: `Bearer ${storedData?.token}`
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 setTimeSheets(response.data);
@@ -37,7 +57,7 @@ export default function TimeSheets() {
             const response = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/time-sheets/${sheetId}/${newState}`, {
                 headers: {
                     'Accept': '*/*',
-                    'Authorization': `Bearer ${storedData?.token}`
+                    'Authorization': `Bearer ${token}`
                 }
             });
 
@@ -96,7 +116,8 @@ export default function TimeSheets() {
                                             <td className="px-6 py-4 whitespace-nowrap">{`${timesheet.employee.employee_name} ${timesheet.employee.employee_lastname}`}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.employee.employee_pay_type}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_check_date}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_state}</td>
+                                            {/* <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_state}</td> */}
+                                            <TimeSheetState sheet_state={timesheet.sheet_state} />
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_hours}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_pay_rate}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_total_payed}</td>

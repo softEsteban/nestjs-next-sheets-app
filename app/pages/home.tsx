@@ -1,11 +1,14 @@
 import React from "react";
 import { useRouter } from "next/router";
 import AppLayout from "@/components/layouts/AppLayout";
-import { FaUsers, FaMoneyBillAlt } from "react-icons/fa";
+import { FaUsers, FaMoneyBillAlt, FaRegUser } from "react-icons/fa";
 import { user } from "@/utils/authUtils";
 import DashboardBanner from "@/components/DashboardBanner/DashboardBanner";
 
 export default function Home() {
+
+    const isAdmin = user?.user_type === 'admin';
+
     const router = useRouter();
 
     const redirectToEmployees = () => {
@@ -15,6 +18,11 @@ export default function Home() {
     const redirectToPayrolls = () => {
         router.push("/time-sheets");
     };
+
+    const redirectToUsers = () => {
+        router.push("/users");
+    };
+
 
     return (
         <AppLayout>
@@ -39,18 +47,28 @@ export default function Home() {
                     <section className="flex flex-wrap mt-8">
                         <div
                             onClick={redirectToEmployees}
-                            style={{backgroundColor: "#58387b"}} className="flex flex-col items-center justify-center mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                            style={{ backgroundColor: "#58387b" }} className="flex flex-col items-center justify-center mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
                         >
                             <FaUsers className="text-white text-4xl mb-2" />
                             <p className="text-white text-xl font-semibold">View Employees</p>
                         </div>
                         <div
                             onClick={redirectToPayrolls}
-                            style={{backgroundColor: "#58387b"}} className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
-                        >   
+                            style={{ backgroundColor: "#58387b" }} className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                        >
                             <FaMoneyBillAlt className="text-white text-4xl mb-2" />
                             <p className="text-white text-xl font-semibold">View Payrolls</p>
                         </div>
+
+                        {isAdmin && <div
+                            onClick={redirectToUsers}
+                            style={{ backgroundColor: "#58387b" }} className="flex flex-col items-center justify-center bg-green-500 mb-4 w-full md:w-1/6 sm:w-2/8 rounded-lg transition duration-300 mx-4 h-24 hover:transform hover:scale-105 hover:shadow-lg cursor-pointer"
+                        >
+                            <FaRegUser className="text-white text-4xl mb-2" />
+                            <p className="text-white text-xl font-semibold">View Users</p>
+                        </div>}
+
+
                     </section>
 
 

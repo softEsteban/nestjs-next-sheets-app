@@ -1,4 +1,4 @@
-interface TimeSheets {
+interface TimeSheet {
     sheet_id: number;
     sheet_state: string;
     sheet_hours: number;
@@ -12,4 +12,4 @@ interface TimeSheets {
     }
 }
 
-export default TimeSheets;
+export default TimeSheet;

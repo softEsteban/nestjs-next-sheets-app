@@ -56,19 +56,12 @@ const Login = () => {
                 }
             }
 
-            else if (response.data.message === "User was not found") {
-                handleFailedAction("User was not found!");
-            }
-            else if (response.data.message === "Password is incorrect") {
-                handleFailedAction("Password is incorrect!");
-            }
-
         } catch (error: any) {
             const response = error?.response.data;
             if (response.message === "User was not found") {
                 handleFailedAction("User was not found");
-            } else if (response.message === "Invalid credentials") {
-                handleFailedAction("Invalid password");
+            } else if (response.message === "Password is incorrect") {
+                handleFailedAction("Password is incorrect");
             } else {
                 handleInfoAction("There has been a server error. Try later, please!");
             }

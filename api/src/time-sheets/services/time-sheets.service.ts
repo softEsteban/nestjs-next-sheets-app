@@ -167,8 +167,14 @@ export class TimeSheetsService {
 
     return await this.timeSheetsRepository.save(timeSheet);
   }
-  
+
   async updateState(id: number, newState: string): Promise<TimeSheet> {
+
+    const state: TimeSheetsStates = TimeSheetsStates[newState.toUpperCase() as keyof typeof TimeSheetsStates];
+    if (!state) {
+      throw new BadRequestException("Time sheet state must be either 'approved' or 'declined'");
+    }
+
     const timeSheet = await this.timeSheetsRepository.findOne({
       where: {
         sheet_id: id

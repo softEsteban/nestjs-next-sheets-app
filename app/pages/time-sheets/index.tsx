@@ -4,12 +4,12 @@ import { storedData, user } from "@/utils/authUtils";
 import axios from "axios";
 import AddUpdateTimeSheet from "@/components/AddUpdateTimeSheet/AddUpdateTimeSheet";
 import NoData from "@/components/NoData/NoData";
-import TimeSheets from "@/types/time.sheets.type";
+import TimeSheet from "@/types/time.sheet.type";
 
 export default function TimeSheets() {
 
     const isAdmin = user?.user_type === 'admin';
-    const [timeSheets, setTimeSheets] = useState<TimeSheets[]>([]);
+    const [timeSheets, setTimeSheets] = useState<TimeSheet[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -28,45 +28,33 @@ export default function TimeSheets() {
         fetchData();
     }, [isAdmin]);
 
+    const handleAddTimeSheetAction = (newTimeSheet: TimeSheet) => {
+        setTimeSheets([...timeSheets, newTimeSheet]);
+    };
 
-    // // Modal
-    // const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-    // const [selectedEmployee, setSelectedEmployee] = useState<Employee>();
-    // const [employeeAction, setEmployeeAction] = useState<'create' | 'update'>('create');
+    const handleStateUpdate = async (sheetId: number, newState: string) => {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_HOST}/time-sheets/${sheetId}/${newState}`, {
+                headers: {
+                    'Accept': '*/*',
+                    'Authorization': `Bearer ${storedData?.token}`
+                }
+            });
 
-    // // Functions to handle modal actions
-    // const handleAddEmployee = () => {
-    //     setEmployeeAction('create');
-    //     setShowEmployeeModal(true);
-    // };
+            const updatedIndex = timeSheets.findIndex(sheet => sheet.sheet_id === sheetId);
+            if (updatedIndex !== -1) {
+                setTimeSheets(prevTimeSheets => {
+                    const newTimeSheets = [...prevTimeSheets];
+                    newTimeSheets[updatedIndex].sheet_state = newState;
+                    return newTimeSheets;
+                });
+            }
 
-    // const handleEditEmployee = (employee: Employee) => {
-    //     setEmployeeAction('update');
-    //     setShowEmployeeModal(true);
-    //     setSelectedEmployee(employee);
-    // };
-
-    // const handleCloseEmployeeModal = () => {
-    //     setShowEmployeeModal(false);
-    // };
-
-    // const handleAddEmployeeAction = (newEmployee: Employee) => {
-    //     setEmployees([...employees, newEmployee]);
-    // };
-
-    // const handleUpdateEmployeeAction = (updatedEmployee: Employee) => {
-    //     setEmployees(employees.map((employee: Employee) => (employee.employee_id === updatedEmployee.employee_id ? updatedEmployee : employee)));
-    // };
-
-    // const handleDeleteEmployee = async (pemployeeId: any) => {
-    //     // try {
-    //     //     // Perform DELETE request
-    //     //     setProducts(products.filter((product) => product.id !== productId));
-    //     // } catch (error) {
-    //     //     console.error(`Error deleting product with ID ${productId}:`, error);
-    //     // }
-    // };
-
+            console.log('Response:', response.data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
 
     return (
         <>
@@ -80,14 +68,9 @@ export default function TimeSheets() {
                                     <h2 className="text-2xl font-semibold mb-2">Time sheets history</h2>
                                     <p className="text-sm text-gray-500">View and manage all time sheets</p>
                                 </div>
-
                                 <section className="bg-white p-6 rounded-lg shadow-md">
-                                    <AddUpdateTimeSheet />
-
+                                    <AddUpdateTimeSheet handleAddTimeSheet={handleAddTimeSheetAction} />
                                 </section>
-
-
-
                             </div>
                         </section>
                     </section>
@@ -100,6 +83,7 @@ export default function TimeSheets() {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Name</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee Pay type</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Hours</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hourly Rate</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pay</th>
@@ -112,15 +96,19 @@ export default function TimeSheets() {
                                             <td className="px-6 py-4 whitespace-nowrap">{`${timesheet.employee.employee_name} ${timesheet.employee.employee_lastname}`}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.employee.employee_pay_type}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_check_date}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_state}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_hours}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_pay_rate}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_total_payed}</td>
-                                            {isAdmin && (
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <button className="bg-red-400 text-white px-4 py-2 rounded-md mr-2">Decline</button>
-                                                    <button className="bg-green-400 text-white px-4 py-2 rounded-md">Approve</button>
-                                                </td>
-                                            )}
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {isAdmin && timesheet.sheet_state === "pending" && (
+                                                    <>
+                                                        <button className="bg-red-400 text-white px-4 py-2 rounded-md mr-2" onClick={() => handleStateUpdate(timesheet.sheet_id, 'declined')}>Decline</button>
+                                                        <button className="bg-green-400 text-white px-4 py-2 rounded-md" onClick={() => handleStateUpdate(timesheet.sheet_id, 'approved')}>Approve</button>
+                                                    </>
+                                                )}
+
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -130,17 +118,6 @@ export default function TimeSheets() {
                         )}
                     </div>
                 </main>
-
-                {/* Create & Update Product Modal */}
-                {/* {showEmployeeModal && (
-                    <AddUpdateEmployeeModal
-                        handleCloseModal={handleCloseEmployeeModal}
-                        handleAddEmployee={handleAddEmployeeAction}
-                        handleUpdateEmployee={handleUpdateEmployeeAction}
-                        action={employeeAction}
-                        selectedEmployee={selectedEmployee}
-                    />
-                )} */}
             </AppLayout>
         </>
     );

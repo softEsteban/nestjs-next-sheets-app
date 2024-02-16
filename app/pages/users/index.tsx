@@ -3,12 +3,10 @@ import AppLayout from "@/components/layouts/AppLayout";
 import { token } from "@/utils/authUtils";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
-import Employee from "@/types/employee.type";
 import { formattedDate } from "@/utils/dateUtils";
-import AddUpdateEmployeeModal from "@/components/AddUpdateEmployeeModal/AddUpdateEmployeeModal";
 import NoData from "@/components/NoData/NoData";
-import { handleSuccessfulAction } from '@/utils/toastUtils';
 import User from "@/types/user.type";
+import AddUpdateUserModal from "@/components/AddUpdateUserModal/AddUpdateUserModal";
 
 export default function Users() {
 
@@ -48,23 +46,23 @@ export default function Users() {
         setSelectedUser(user);
     };
 
-    // const handleCloseEmployeeModal = () => {
-    //     setShowUserModal(false);
-    // };
+    const handleCloseUserModal = () => {
+        setShowUserModal(false);
+    };
 
-    // const handleAddEmployeeAction = (newEmployee: Employee) => {
-    //     setEmployees([...employees, newEmployee]);
-    //     handleSuccessfulAction("Employee has been successfully created!");
-    // };
+    const handleAddUserAction = (newUser: User) => {
+        setUsers([...users, newUser]);
+        // handleSuccessfulAction("User has been successfully created!");
+    };
 
-    // const handleUpdateEmployeeAction = (updatedEmployee: Employee) => {
-    //     setEmployees(employees.map((employee: Employee) => (employee.employee_id === updatedEmployee.employee_id ? updatedEmployee : employee)));
-    //     handleSuccessfulAction("Employee has been successfully updated!");
-    // };
+    const handleUpdateUserAction = (updatedUser: User) => {
+        setUsers(users.map((user: User) => (user.user_id === updatedUser.user_id ? updatedUser : user)));
+        // handleSuccessfulAction("User has been successfully updated!");
+    };
 
     return (
         <AppLayout>
-            <title>Employees Management</title>
+            <title>Users Management</title>
             <main className="min-h-screen p-4 sm:p-8 bg-gray-100 rounded-xl">
                 <section className="mt-8">
                     <section className="flex items-center justify-between mt-8 mb-8">
@@ -85,6 +83,7 @@ export default function Users() {
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User Type</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -95,7 +94,8 @@ export default function Users() {
                                         <tr key={user.user_id}>
                                             <td className="px-6 py-4 whitespace-nowrap">{user.user_name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{user.user_lastname}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{user.user_type}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{user.user_email}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{user.user_type.toLocaleUpperCase()}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{formattedDate(user.user_created_at)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <button className="text-indigo-600 hover:text-indigo-900 mr-2" onClick={() => handleEditUser(user)}>Edit</button>
@@ -112,16 +112,17 @@ export default function Users() {
                 </section>
             </main>
 
-            {/* Create & Update Product Modal */}
-            {/* {showEmployeeModal && (
-                <AddUpdateEmployeeModal
-                    handleCloseModal={handleCloseEmployeeModal}
-                    handleAddEmployee={handleAddEmployeeAction}
-                    handleUpdateEmployee={handleUpdateEmployeeAction}
+            {/* Create & Update User Modal */}
+            {showUserModal && (
+                <AddUpdateUserModal
+                    handleCloseModal={handleCloseUserModal}
+                    handleAddUser={handleAddUserAction}
+                    handleUpdateUser={handleUpdateUserAction}
                     action={employeeAction}
                     selectedUser={selectedUser}
                 />
-            )} */}
+            )}
+
         </AppLayout>
     );
 }

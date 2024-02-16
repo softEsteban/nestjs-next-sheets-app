@@ -8,6 +8,7 @@ import { formattedDate } from "@/utils/dateUtils";
 import AddUpdateEmployeeModal from "@/components/AddUpdateEmployeeModal/AddUpdateEmployeeModal";
 import NoData from "@/components/NoData/NoData";
 import { handleSuccessfulAction } from '@/utils/toastUtils';
+import ViewTimeSheetsDetailModal from "@/components/ViewTimeSheetsDetailModal/ViewTimeSheetsDetailModal";
 
 export default function Employees() {
 
@@ -32,11 +33,23 @@ export default function Employees() {
     }, [isAdmin]);
 
     // Modal
+    const [showTimeSheetsDetailModal, setShowTimeSheetsDetailModal] = useState(false);
+
     const [showEmployeeModal, setShowEmployeeModal] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState<Employee>();
     const [employeeAction, setEmployeeAction] = useState<'create' | 'update'>('create');
 
-    // Functions to handle modal actions
+
+    // Functions to handle modals actions
+    const handleViewTimeSheetsDetail = (employee: Employee) => {
+        setSelectedEmployee(employee);
+        setShowTimeSheetsDetailModal(true);
+    };
+
+    const handleCloseTimeSheetsDetailModal = () => {
+        setShowTimeSheetsDetailModal(false);
+    };
+
     const handleAddEmployee = () => {
         setEmployeeAction('create');
         setShowEmployeeModal(true);
@@ -101,7 +114,7 @@ export default function Employees() {
                                             <td className="px-6 py-4 whitespace-nowrap">{formattedDate(employee.employee_created_at)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <button className="text-indigo-600 hover:text-indigo-900 mr-2" onClick={() => handleEditEmployee(employee)}>Edit</button>
-                                                <button className="text-indigo-600 hover:text-indigo-900">View pay rolls</button>
+                                                <button className="text-indigo-600 hover:text-indigo-900" onClick={() => handleViewTimeSheetsDetail(employee)}>View pay rolls</button>
                                             </td>
                                         </tr>
                                     ))}
@@ -115,7 +128,7 @@ export default function Employees() {
                 </section>
             </main>
 
-            {/* Create & Update Product Modal */}
+            {/* Create & Update Employee Modal */}
             {showEmployeeModal && (
                 <AddUpdateEmployeeModal
                     handleCloseModal={handleCloseEmployeeModal}
@@ -123,6 +136,14 @@ export default function Employees() {
                     handleUpdateEmployee={handleUpdateEmployeeAction}
                     action={employeeAction}
                     selectedEmployee={selectedEmployee}
+                />
+            )}
+
+            {/* View time sheets detail Modal */}
+            {showTimeSheetsDetailModal && (
+                <ViewTimeSheetsDetailModal
+                    employee={selectedEmployee}
+                    handleCloseModal={handleCloseTimeSheetsDetailModal}
                 />
             )}
         </AppLayout>

@@ -99,14 +99,13 @@ export default function Users() {
                                             <td className="px-6 py-4 whitespace-nowrap">{formattedDate(user.user_created_at)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <button className="text-indigo-600 hover:text-indigo-900 mr-2" onClick={() => handleEditUser(user)}>Edit</button>
-                                                {/* <button className="text-indigo-600 hover:text-indigo-900">View pay rolls</button> */}
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         ) : (
-                            <NoData text={"Try adding some employees to see them here."} />
+                            <NoData text={"Try adding some users to see them here."} />
                         )}
                     </div>
 

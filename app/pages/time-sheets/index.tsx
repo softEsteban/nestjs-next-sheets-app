@@ -5,26 +5,8 @@ import axios from "axios";
 import AddUpdateTimeSheet from "@/components/AddUpdateTimeSheet/AddUpdateTimeSheet";
 import NoData from "@/components/NoData/NoData";
 import TimeSheet from "@/types/time.sheet.type";
+import TimeSheetState from "@/components/TimeSheetState/TimeSheetState";
 
-const TimeSheetState = ({ sheet_state }: any) => {
-    let badgeClasses = 'px-2 py-1 inline-block rounded-full ';
-
-    if (sheet_state === 'pending') {
-        badgeClasses += 'bg-yellow-300 text-white';
-    } else if (sheet_state === 'approved') {
-        badgeClasses += 'bg-green-300 text-white';
-    } else if (sheet_state === 'declined') {
-        badgeClasses += 'bg-red-300 text-white';
-    }
-
-    return (
-        <td className="px-6 py-4 whitespace-nowrap">
-            <span className={badgeClasses}>
-                {sheet_state}
-            </span>
-        </td>
-    );
-};
 
 export default function TimeSheets() {
 
@@ -116,7 +98,6 @@ export default function TimeSheets() {
                                             <td className="px-6 py-4 whitespace-nowrap">{`${timesheet.employee.employee_name} ${timesheet.employee.employee_lastname}`}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.employee.employee_pay_type}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_check_date}</td>
-                                            {/* <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_state}</td> */}
                                             <TimeSheetState sheet_state={timesheet.sheet_state} />
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_hours}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_pay_rate}</td>

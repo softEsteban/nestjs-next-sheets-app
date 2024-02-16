@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import AppLayout from "@/components/layouts/AppLayout";
 import { FaUsers, FaMoneyBillAlt, FaRegUser } from "react-icons/fa";
-import { user } from "@/utils/authUtils";
+import { user, token } from "@/utils/authUtils";
 import DashboardBanner from "@/components/DashboardBanner/DashboardBanner";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import TimeSheet from "@/types/time.sheet.type";
+import axios from "axios";
+
+
+// Define types for salary and hourly
+interface MonthlyData {
+    salary: number;
+    hourly: number;
+}
+
 
 export default function Home() {
 
@@ -24,22 +34,59 @@ export default function Home() {
         router.push("/users");
     };
 
-    const data = [
-        { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
-        { name: 'Feb', uv: 3000, pv: 1398, amt: 2210 },
-        { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
-        { name: 'Apr', uv: 2780, pv: 3908, amt: 2000 },
-        { name: 'May', uv: 1890, pv: 4800, amt: 2181 },
-        { name: 'Jun', uv: 2390, pv: 3800, amt: 2500 },
-        { name: 'Jul', uv: 3490, pv: 4300, amt: 2100 },
-    ];
+    const [timeSheets, setTimeSheets] = useState<TimeSheet[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                let url = isAdmin ? `${process.env.NEXT_PUBLIC_HOST}/time-sheets` : `${process.env.NEXT_PUBLIC_HOST}/time-sheets/user/${user.user_id}`;
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setTimeSheets(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [isAdmin]);
+
+
+    // Grouping time sheets data by month
+    const groupedData: { [key: string]: MonthlyData } = timeSheets.reduce((acc: any, sheet: any) => {
+        const month = sheet.sheet_check_date.substring(0, 7);
+        if (!acc[month]) {
+            acc[month] = { salary: 0, hourly: 0 };
+        }
+        if (sheet.employee.employee_pay_type === 'salary') {
+            acc[month].salary += sheet.sheet_total_payed;
+        } else if (sheet.employee.employee_pay_type === 'hourly') {
+            acc[month].hourly += sheet.sheet_total_payed;
+        }
+        return acc;
+    }, {});
+
+    // Converting grouped data into the desired format
+    const formattedData = Object.entries(groupedData).map(([month, { salary, hourly }]) => ({
+        name: month,
+        salary,
+        hourly,
+    }));
+
+    formattedData.sort((a, b) => {
+        const dateA = new Date(a.name);
+        const dateB = new Date(b.name);
+        return dateA.getTime() - dateB.getTime();
+    });
 
     return (
         <AppLayout>
             <title>Home</title>
             <main className="min-h-screen p-4 sm:p-8 bg-gray-100 rounded-xl">
                 <section className="mt-8">
-                    
+
                     <section className="flex items-center justify-between mt-8 mb-8">
                         <div>
                             <h2 className="text-2xl font-semibold mb-2">Welcome back, {user?.user_name}!</h2>
@@ -78,21 +125,21 @@ export default function Home() {
                             <p className="text-white text-xl font-semibold">View Users</p>
                         </div>}
                     </section>
-                        
+
 
                     <section className="mt-8">
                         <h2 className="text-2xl font-semibold mb-2">Salary and Hourly payrolls Chart</h2>
-                        <LineChart width={600} height={300} data={data}>
+                        <LineChart width={600} height={300} data={formattedData}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="pv" stroke="#8884d8" />
-                            <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+                            <Line type="monotone" dataKey="salary" stroke="#8884d8" />
+                            <Line type="monotone" dataKey="hourly" stroke="#82ca9d" />
                         </LineChart>
                     </section>
-                        
+
                 </section>
             </main>
         </AppLayout>

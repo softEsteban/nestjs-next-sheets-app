@@ -64,7 +64,7 @@ export default function ViewTimeSheetsDetailModal({ employee, handleCloseModal }
                                         <td className="px-6 py-4 whitespace-nowrap">{timeSheet.sheet_check_date}</td>
                                         <TimeSheetState sheet_state={timeSheet.sheet_state} />
                                         <td className="px-6 py-4 whitespace-nowrap">{timeSheet.sheet_hours}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap">{timeSheet.sheet_total_payed}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">${timeSheet.sheet_total_payed.toLocaleString()}</td>
                                     </tr>
                                 ))}
                             </tbody>

@@ -96,7 +96,7 @@ export default function TimeSheets() {
                                     {timeSheets.map((timesheet) => (
                                         <tr key={timesheet.sheet_id}>
                                             <td className="px-6 py-4 whitespace-nowrap">{`${timesheet.employee.employee_name} ${timesheet.employee.employee_lastname}`}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{timesheet.employee.employee_pay_type}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{timesheet.employee.employee_pay_type.toUpperCase()}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_check_date}</td>
                                             <TimeSheetState sheet_state={timesheet.sheet_state} />
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_hours}</td>

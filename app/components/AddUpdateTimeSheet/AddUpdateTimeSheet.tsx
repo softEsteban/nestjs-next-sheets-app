@@ -98,7 +98,20 @@ export default function AddUpdateTimeSheet({ handleAddTimeSheet }: any) {
                     <>
                         <div className="w-full sm:w-48">
                             <label htmlFor="hourlyRate" className="block text-sm font-medium text-gray-700">Hourly Rate</label>
-                            <input type="text" name="hourlyRate" id="hourlyRate" value={selectedEmployee.employee_pay_rate} className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                            <input type="text"
+                                name="hourlyRate"
+                                id="hourlyRate"
+                                value={selectedEmployee.employee_pay_rate}
+                                onChange={(e) => {
+                                    const newValue = e.target.value;
+                                    setSelectedEmployee((prevState: any) => {
+                                        if (prevState) {
+                                            return { ...prevState, employee_pay_rate: newValue };
+                                        }
+                                        return prevState;
+                                    });
+                                }}
+                                className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                         </div>
                         <div className="w-full sm:w-48">
                             <label htmlFor="totalHours" className="block text-sm font-medium text-gray-700">Total Hours</label>

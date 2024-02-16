@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AppLayout from "@/components/layouts/AppLayout";
 import { user, token } from "@/utils/authUtils";
 import axios from "axios";
-import { FaPlus } from "react-icons/fa";
+import { FaEdit, FaEye, FaPlus } from "react-icons/fa";
 import Employee from "@/types/employee.type";
 import { formattedDate } from "@/utils/dateUtils";
 import AddUpdateEmployeeModal from "@/components/AddUpdateEmployeeModal/AddUpdateEmployeeModal";
@@ -109,12 +109,16 @@ export default function Employees() {
                                         <tr key={employee.employee_id}>
                                             <td className="px-6 py-4 whitespace-nowrap">{employee.employee_name}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{employee.employee_lastname}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">{employee.employee_pay_type}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">{employee.employee_pay_type.toUpperCase()}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">${employee.employee_pay_rate}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">{formattedDate(employee.employee_created_at)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <button className="text-indigo-600 hover:text-indigo-900 mr-2" onClick={() => handleEditEmployee(employee)}>Edit</button>
-                                                <button className="text-indigo-600 hover:text-indigo-900" onClick={() => handleViewTimeSheetsDetail(employee)}>View pay rolls</button>
+                                                <button className="text-indigo-600 hover:text-indigo-900 mr-2" onClick={() => handleEditEmployee(employee)}>
+                                                    <FaEdit className="inline-block mr-1" />Edit
+                                                </button>
+                                                <button className="text-indigo-600 hover:text-indigo-900" onClick={() => handleViewTimeSheetsDetail(employee)}>
+                                                    <FaEye className="inline-block mr-1" />View pay rolls
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

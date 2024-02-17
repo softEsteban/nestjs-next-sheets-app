@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { FaUserCircle, FaLock } from 'react-icons/fa';
-import '../app/globals.css';
 import { useRouter } from 'next/router';
 import { useDispatch } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
@@ -9,6 +8,23 @@ import axios from 'axios';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import { setSelectedComponent } from '@/redux/reducer';
 import { handleSuccessfulAction, handleInfoAction, handleFailedAction } from '@/utils/toastUtils';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as yup from 'yup';
+
+interface LoginFormValues {
+    email: string;
+    password: string;
+}
+
+const initialValues: LoginFormValues = {
+    email: "",
+    password: ""
+}
+
+const validationSchema = yup.object({
+    email: yup.string().required("Email is required").email("Email must be a valid email format"),
+    password: yup.string().required("Password is required. Come on!").min(8),
+})
 
 const Login = () => {
     const router = useRouter();
@@ -19,13 +35,12 @@ const Login = () => {
         dispatch(setSelectedComponent(menu));
     };
 
-    const [user, setUser] = useState({ email: '', password: '' });
-
-    const handleLogin = async () => {
+    const handleLogin = async (values: LoginFormValues) => {
         try {
+            
             const response = await axios.post(`${process.env.NEXT_PUBLIC_HOST}/auth/login`, {
-                user_email: user.email,
-                user_password: user.password,
+                user_email: values.email,
+                user_password: values.password,
             }, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -78,37 +93,37 @@ const Login = () => {
                     <h2 className="text-3xl lg:text-4xl font-semibold mb-4 text-purple-900 text-center">
                         Sign In
                     </h2>
-                    <div className="mb-4">
-                        <div className="flex items-center border rounded-full p-2">
-                            <FaUserCircle className="text-gray-500 mr-2" />
-                            <input
-                                type="text"
-                                placeholder="Email"
-                                className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
-                                value={user.email}
-                                onChange={(e) => setUser({ ...user, email: e.target.value })}
-                            />
-                        </div>
-                    </div>
-                    <div className="mb-4">
-                        <div className="flex items-center border rounded-full p-2">
-                            <FaLock className="text-gray-500 mr-2" />
-                            <input
-                                type="password"
-                                placeholder="Password"
-                                className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0"
-                                value={user.password}
 
-                                onChange={(e) => setUser({ ...user, password: e.target.value })}
-                            />
-                        </div>
-                    </div>
-                    <button
-                        onClick={handleLogin}
-                        className="bg-purple-800 text-white rounded-full py-2 px-6 hover:bg-purple-900 w-full mb-4"
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        onSubmit={(values, { setSubmitting }) => {
+                            handleLogin(values);
+                            setSubmitting(false);
+                        }}
                     >
-                        Sign In
-                    </button>
+                        {({ isSubmitting, isValidating, isValid }) => (
+                            <Form className="space-y-4">
+                                <div className="mb-4">
+                                    <div className="flex items-center border rounded-full p-2">
+                                        <FaUserCircle className="text-gray-500 mr-2" />
+                                        <Field type="email" name="email" placeholder="Email" className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0" />
+                                    </div>
+                                    <ErrorMessage name="email" component="div" className="text-red-500 text-sm ml-8" />
+                                </div>
+                                <div className="mb-4">
+                                    <div className="flex items-center border rounded-full p-2">
+                                        <FaLock className="text-gray-500 mr-2" />
+                                        <Field type="password" name="password" placeholder="Password" className="w-full outline-none text-gray-700 bg-gray-500 bg-opacity-0" />
+                                    </div>
+                                    <ErrorMessage name="password" component="div" className="text-red-500 text-sm ml-8" />
+                                </div>
+                                <button type="submit" disabled={isSubmitting || isValidating || !isValid} className="bg-purple-800 text-white rounded-full py-2 px-6 hover:bg-purple-900 w-full mb-4">
+                                    Submit
+                                </button>
+                            </Form>
+                        )}
+                    </Formik>
                     <div className="text-sm text-center pt-2">
                         <a href="#" className="text-blue-500 hover:underline">
                             Forgot your password?
@@ -117,7 +132,6 @@ const Login = () => {
                 </div>
             </div>
         </PublicLayout>
-
     );
 };
 

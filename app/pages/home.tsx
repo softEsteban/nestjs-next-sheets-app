@@ -8,13 +8,10 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'r
 import TimeSheet from "@/types/time.sheet.type";
 import axios from "axios";
 
-
-// Define types for salary and hourly
 interface MonthlyData {
     salary: number;
     hourly: number;
 }
-
 
 export default function Home() {
 
@@ -126,9 +123,12 @@ export default function Home() {
                         </div>}
                     </section>
 
-
                     <section className="mt-8">
-                        <h2 className="text-2xl font-semibold mb-2">Salary and Hourly payrolls Chart</h2>
+                        <div className="mb-10">
+                            <h2 className="text-2xl font-semibold mb-2">Payrolls Chart</h2>
+                            <p className="text-sm text-gray-500">Amounts payed by salary or hourly</p>
+                        </div>
+
                         <LineChart width={600} height={300} data={formattedData}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />

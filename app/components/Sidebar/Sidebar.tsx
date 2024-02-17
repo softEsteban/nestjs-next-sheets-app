@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaBars, FaClock, FaHardHat, FaHome, FaRegUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaClock, FaFileAlt, FaHardHat, FaHome, FaRegUser, FaSignOutAlt } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { menu, user } from "@/utils/authUtils";
 
@@ -55,6 +55,11 @@ const Sidebar = ({ isSidebarOpen }: any) => {
                     {item.menu_icon === 'FaSignOutAlt' && (
                         <span className="mr-2">
                             <FaSignOutAlt />
+                        </span>
+                    )}
+                    {item.menu_icon === 'FaFileAlt' && (
+                        <span className="mr-2">
+                            <FaFileAlt />
                         </span>
                     )}
 

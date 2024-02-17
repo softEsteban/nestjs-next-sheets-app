@@ -100,8 +100,8 @@ export default function TimeSheets() {
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_check_date}</td>
                                             <TimeSheetState sheet_state={timesheet.sheet_state} />
                                             <td className="px-6 py-4 whitespace-nowrap">{timesheet.sheet_hours}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_pay_rate}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_total_payed}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_pay_rate.toLocaleString()}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap">${timesheet.sheet_total_payed.toLocaleString()}</td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {isAdmin && timesheet.sheet_state === "pending" && (
                                                     <>
